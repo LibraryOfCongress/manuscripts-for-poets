@@ -1,0 +1,12 @@
+{
+    "editor.tabSize": 2,
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "[python]": {
+        "editor.tabSize": 4,
+    },
+    "python.linting.pylintArgs": [
+        "--max-line-length=150",
+        "--disable=C0103,W0401,W0614"
+    ]
+}

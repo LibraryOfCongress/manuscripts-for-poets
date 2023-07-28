@@ -1,0 +1,12 @@
+.DS_Store
+tmp/*
+!tmp/.keep
+data/*
+!data/.keep
+output/*
+!output/.keep
+node_modules/
+*.log
+package-lock.json
+s3_website.yml
+*.pyc
