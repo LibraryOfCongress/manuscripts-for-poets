@@ -34,9 +34,11 @@ def processUrl(url, a):
     # Download item json data from loc.gov API
     filename = f"{itemDir}item.json"
     jsonUrl = f"{url}?fo=json"
+    if a.OVERWRITE:
+        removeDir(itemDir)
     makeDirectories(itemDir)
     print(f"Downloading {jsonUrl}...")
-    download(jsonUrl, filename, overwrite=a.OVERWRITE)
+    download(jsonUrl, filename, overwrite=False)
     # Read the item json data
     data = readJSON(filename)
     if "resources" in data and "item" in data:
@@ -51,10 +53,10 @@ def processUrl(url, a):
                 resouresFilename = f"{itemDir}resources.zip"
                 resourcesDir = f"{itemDir}resources"
                 # Download and unpack the file if necessary
-                if not os.path.isdir(resourcesDir) or a.OVERWRITE:
-                    if not os.path.isfile(resouresFilename) or a.OVERWRITE:
+                if not os.path.isdir(resourcesDir):
+                    if not os.path.isfile(resouresFilename):
                         print(f"Downloading {fileUrl}...")
-                        download(fileUrl, resouresFilename, overwrite=a.OVERWRITE)
+                        download(fileUrl, resouresFilename, overwrite=False)
                     print(f"Unzipping {resouresFilename}...")
                     unzipFile(resouresFilename, resourcesDir)
                     # remove zip file
