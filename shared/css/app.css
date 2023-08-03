@@ -13,7 +13,7 @@ a {
   font-weight: bold;
 }
 a:focus,
-input:focus,
+input[type="text"]:focus,
 select:focus,
 button:focus {
   outline-style: solid;
