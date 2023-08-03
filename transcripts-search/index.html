@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CCDI BtP Projects</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <link rel="stylesheet" href="../shared/css/vendor/normalize.css">
+  <link rel="stylesheet" href="../shared/css/app.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+
+  <div id="app" class="app">
+    <nav aria-label="Search and facet bar" class="search-menu">
+      <form class="search-form">
+        <div class="form-field">
+          <label for="search-query">Search by keyword</label>
+          <input type="text" id="search-query" name="query" />
+        </div>
+        <div class="form-field">
+          <label for="search-date-start">Date start</label>
+          <select id="search-date-start">
+            <option value="">--</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="search-date-end">Date end</label>
+          <select id="search-date-end">
+            <option value="">--</option>
+          </select>
+        </div>
+        <button type="submit" class="form-field">Submit</button>
+      </form>
+    </nav>
+    <div class="search-results">
+      <ul class="search-results-list">
+        <li class="selected">
+          Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few <button class="select-item" data-id="id">View</button>
+        </li>
+        <li>
+          Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few <button class="select-item" data-id="id">View</button>
+        </li>
+        <li>
+          Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few <button class="select-item" data-id="id">View</button>
+        </li>
+        <li>
+          Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few <button class="select-item" data-id="id">View</button>
+        </li>
+        <li>
+          Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few <button class="select-item" data-id="id">View</button>
+        </li>
+      </ul>
+      <div class="search-results-item active">
+        <div class="search-results-item-image" style="background-image: url(http://tile.loc.gov/image-services/iiif/service:mss:mss42549:mss42549-004:00170/full/pct:100/0/default.jpg);"></div>
+        <div class="search-results-item-detail">
+          <h2>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h2>
+          <p><a href="http://tile.loc.gov/image-services/iiif/service:mss:mss42549:mss42549-004:00170/full/pct:100/0/default.jpg" target="_blank" class="button">View image</a> <a href="https://www.loc.gov/item/mss425490040/" class="button" target="_blank">View item</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/js/vendor/jquery-3.7.0.min.js"></script>
+  <script src="../shared/js/vendor/underscore-umd-1.13.6.min.js"></script>
+
+  <script src="../shared/js/lib/MathUtil.js"></script>
+
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>

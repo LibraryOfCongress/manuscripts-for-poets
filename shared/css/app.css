@@ -1,0 +1,52 @@
+html {
+  font: 18px sans-serif;
+  color: white;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+}
+
+a {
+  color: white;
+  font-weight: bold;
+}
+a:focus,
+input:focus,
+select:focus,
+button:focus {
+  outline-style: solid;
+  outline-color: #e71e1e;
+  outline-width: 3px;
+}
+
+button, .button {
+  margin: 0;
+  border: 0;
+  background: #ddd;
+  padding: 4px 8px;
+  display: inline-block;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover, .button:hover {
+  background: white;
+}
+
+p,
+li {
+  line-height: 1.4;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
