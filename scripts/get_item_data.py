@@ -2,9 +2,6 @@
 
 # -*- coding: utf-8 -*-
 
-# Example usage:
-#   python scripts/get_item_data.py -transcript "data/2021387726/resources/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20.csv" -out "data/2021387726/items/"
-
 import argparse
 import os
 import time

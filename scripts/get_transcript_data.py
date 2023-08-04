@@ -4,9 +4,6 @@
 
 # For a list of URLs, see:
 #   https://www.loc.gov/search/?fa=contributor%3Aby+the+people+%28program%29&st=list&c=150
-#
-# Example usage:
-#   python scripts/get_transcript_data.py -url "https://www.loc.gov/item/2020445590/,https://www.loc.gov/item/2021387726/"
 
 import argparse
 import os

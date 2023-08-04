@@ -103,12 +103,15 @@ def filterByQuery(arr, ors, delimeter="|", caseSensitive=False):
                 break
     return results
 
-def filterByQueryString(arr, str):
+def filterByQueryString(arr, queryString, verbose=True):
     """Filters a list given a query string"""
-    queries = [parseQueryString(str) for str in str.split(" | ")]
+    queryStrings = queryString.split(" | ")
     filteredArr = arr[:]
-    for query in queries:
+    for queryStringItem in queryStrings:
+        query = parseQueryString(queryStringItem)
         filteredArr = filterByQuery(filteredArr, query)
+        if verbose:
+            print(f"{len(filteredArr)} items after filter query '{queryStringItem}'")
     return filteredArr
 
 def getFilenames(fileString, verbose=False):
@@ -149,12 +152,12 @@ def parseNumber(string, alwaysFloat=False):
     except TypeError:
         return ""
 
-def parseQueryString(str):
+def parseQueryString(queryString):
     """Function for parsing a query string"""
-    if len(str) <= 0:
+    if len(queryString) <= 0:
         return []
     comparators = ["<=", ">=", " NOT IN LIST ", " IN LIST ", " EXCLUDES LIST ", " CONTAINS LIST ", " EXCLUDES ", " CONTAINS ", "!=", ">", "<", "="]
-    orStrings = str.split(" OR ")
+    orStrings = queryString.split(" OR ")
     ors = []
     for orString in orStrings:
         andStrings = orString.split(" AND ")
@@ -246,3 +249,13 @@ def unzipFile(filename, targetDir=False):
         targetDir = filename[:-4] # assuming the filepath ends with .zip
     with zipfile.ZipFile(filename, "r") as r:
         r.extractall(targetDir)
+
+def writeJSON(filename, data, verbose=True, pretty=False):
+    """Function to write JSON data to file"""
+    with open(filename, 'w') as f:
+        if pretty:
+            json.dump(data, f, indent=4)
+        else:
+            json.dump(data, f)
+        if verbose:
+            print(f"Wrote data to {filename}")
