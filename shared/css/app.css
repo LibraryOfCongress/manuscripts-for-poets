@@ -41,6 +41,9 @@ li {
   line-height: 1.4;
 }
 
+.template {
+  display: none;
+}
 .visually-hidden {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);

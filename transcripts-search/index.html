@@ -28,7 +28,7 @@
 
   <div id="app" class="app">
     <nav aria-label="Search and facet bar" class="search-menu">
-      <form class="search-form">
+      <form id="search-form" class="search-form">
         <div class="form-field">
           <label for="search-query">Search by keyword</label>
           <input type="text" id="search-query" name="query" />
@@ -51,140 +51,47 @@
     <div class="search-results">
       <div class="search-results-content">
         <h2 class="visually-hidden">Search results</h2>
-        <p>There are <strong>10 results</strong> for "My dear" in the transcript data.</p>
-        <ul class="search-results-list">
-          <li class="selected">
-            <h3>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h3>
-            <p>...Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few...</p>
-            <button class="select-item" data-id="id">View</button>
-          </li>
-          <li>
-            <h3>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h3>
-            <p>...Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few...</p>
-            <button class="select-item" data-id="id">View</button>
-          </li>
-          <li>
-            <h3>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h3>
-            <p>...Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few...</p>
-            <button class="select-item" data-id="id">View</button>
-          </li>
-          <li>
-            <h3>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h3>
-            <p>...Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few...</p>
-            <button class="select-item" data-id="id">View</button>
-          </li>
-          <li>
-            <h3>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h3>
-            <p>...Oberlin, Ohio. <span class="highlight">My dear Mrs. Terrell</span>: In reply to your note of a few...</p>
-            <button class="select-item" data-id="id">View</button>
-          </li>
-        </ul>
+        <p id="search-results-message"></p>
+        <ul id="search-results-list" class="search-results-list"></ul>
       </div>
-      <div class="search-results-item active">
-        <div class="search-results-item-content">
-          <div class="search-results-item-image" style="background-image: url(http://tile.loc.gov/image-services/iiif/service:mss:mss42549:mss42549-004:00170/full/pct:100/0/default.jpg);"></div>
-          <div class="search-results-item-text">
-<pre>OBERLIN COLLEGE
-OBERLIN, OHIO
+      <div id="search-results-item" class="search-results-item"></div>
+    </div>
+  </div>
 
-Dr. Florence M. Fitch
-Dean of College Women
+  <div id="search-result-list-item-template" class="template">
+    <li class="{{ className }}" data-id="{{ id }}">
+      <h3>{{ sequence }}. {{ title }}</h3>
+      <p>...{{ matchText }}...</p>
+      <button class="select-item" data-id="{{ id }}">View</button>
+    </li>
+  </div>
 
-Miss Anna Beatrice Doerschuk
-Assistant Dean
-
-November 4, 1913
-
-Mrs. Mary C. Terrell,
-15o North Professor St.,
-Oberlin, Ohio.
-
-My dear Mrs. Terrell:
-In reply to your note of a few 
-days ago I can do little more than repeat
-what I said in our conversation.
-
-I think it is altogether possible
-that I promised you that I would put in the
-application for your daughters at Talcott
-Hall.  I have already spoken to Mrs.
-Lawrence  about that matter and I have not
-forgotten that I promised that the year at
-Tenney Cottage should not count as one of
-their three years, but I am very certain
-that I was not so unwise as to promise a
-place at Talcott Hall for next year. My
-experience has made me very certain that
-such promises are unsafe as one never can
-tell from one year to the next how long
-an application may be necessary and I
-take great pains always to avoid committing 
-myself to what may be difficult of
-accomplishment. Of course I do not mean
-now to say that it is at all certain that
-the girls cannot be there but simply that
-we cannot give definite answer until the
-appointments are made, probably in March.
-
-OBERLIN COLLEGE
-OBERLIN, OHIO
-
-Dr. Florence M. Fitch
-Dean of College Women
-
-Miss Anna Beatrice Doerschuk
-Assistant Dean
-
-Mrs. M.C.T.--2.
-
-As to the other matter of making
-some special concession to your daughters
-and giving them places in advance of their
-regular application I feel very confident
-that I cannot do other than I have done
-and insist upon entire impartiality as the
-basis of all my decisions. I do not believe
-we should be furthering at all the
-cause of the colored people if it was felt
-that they were given special favors. It
-could scarcely fail to increase whatever
-sensitiveness there already is on the part
-of some of the white students.
-
-I have asked Mrs. Robson to put
-Mary's name on the list of applicants for
-Baldwin Cottage.  To avoid any possible
-misunderstanding I may as well tell you
-frankly now that it is not at all probable
-that she can [could] be received before her
-Senior year. It has been many years since
-it has been possible for us to receive
-in the Junior year one whose name had not
-been filed a considerable time before her
-entrance to college.
-
-I am exceedingly sorry if any of
-this seems ungracious or inconsiderate but</pre>
-          </div>
-          <div class="item-view-toggle">
-            <fieldset>
-              <legend>View mode:</legend>
-              <div class="radio-option">
-                <input type="radio" id="view-image" name="view" value="image" checked />
-                <label for="view-image">image</label>
-              </div>
-              <div class="radio-option">
-                <input type="radio" id="view-text" name="view" value="text" />
-                <label for="view-text">text</label>
-              </div>
-            </fieldset>
-          </div>
-        </div>        
-        <div class="search-results-item-detail">
-          <h2>Mary Church Terrell Papers: Correspondence, 1886-1954; 1913</h2>
-          <p><a href="http://tile.loc.gov/image-services/iiif/service:mss:mss42549:mss42549-004:00170/full/pct:100/0/default.jpg" target="_blank" class="button">View image</a> <a href="https://www.loc.gov/item/mss425490040/" class="button" target="_blank">View item</a></p>
-        </div>
+  <div id="search-result-item-template" class="template">
+    <div class="search-results-item-content">
+      <div class="search-results-item-image" style="background-image: url({{ DownloadUrl }});"></div>
+      <div class="search-results-item-text">
+<pre>{{ Transcription }}</pre>
       </div>
+      <div class="item-view-toggle">
+        <fieldset>
+          <legend>View mode:</legend>
+          <div class="radio-option">
+            <input type="radio" id="view-image" name="view" value="image" checked />
+            <label for="view-image">image</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="view-text" name="view" value="text" />
+            <label for="view-text">text</label>
+          </div>
+        </fieldset>
+      </div>
+    </div>        
+    <div class="search-results-item-detail">
+      <h2>{{ Item }}</h2>
+      <p>
+        <a href="{{ DownloadUrl }}" target="_blank" class="button">View image</a> 
+        <a href="{{ itemUrl }}" class="button" target="_blank">View item</a>
+      </p>
     </div>
   </div>
 
