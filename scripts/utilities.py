@@ -1,11 +1,14 @@
 """Utility functions to support all scripts"""
 
 import csv
+import dateparser
+import datetime
 import glob
 import json
 import os
 import re
 import shutil
+import sys
 import zipfile
 
 import requests
@@ -14,7 +17,7 @@ def copyFile(src, dst):
     """Function copying file from src to dst."""
     shutil.copyfile(src, dst)
 
-def download(url, filename, overwrite=False):
+def download(url, filename, overwrite=False, prependMessage=""):
     """Function for downloading an arbitrary file as binary file."""
     if os.path.isfile(filename) and not overwrite:
         print(f"{filename} already exists.")
@@ -24,7 +27,7 @@ def download(url, filename, overwrite=False):
         for chunk in r.iter_content(chunk_size=1024):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
-    print(f"Downloaded {filename}.")
+    print(f"{prependMessage}Downloaded {filename}.")
 
 def emptyDirectory(dirname):
     """Function for emptying a directory"""
@@ -114,6 +117,45 @@ def filterByQueryString(arr, queryString, verbose=True):
             print(f"{len(filteredArr)} items after filter query '{queryStringItem}'")
     return filteredArr
 
+def getBasename(fn):
+    """Function to return the name of the filename without an extension"""
+    return os.path.splitext(os.path.basename(fn))[0]
+
+def getDate(dateString):
+    """Funciton to parse an arbitrary date string"""
+    if len(dateString) == 4:
+        year = int(str(dateString))
+        return datetime.datetime(year, 1, 1)
+    else:
+        return dateparser.parse(dateString, settings={'REQUIRE_PARTS': ['year'], 'PREFER_DAY_OF_MONTH': 'first'})
+
+def getDateRange(dateString):
+    """Function to return a date range given a date string"""
+    startDate = None
+    endDate = None
+
+    dateString = dateString.strip()
+    if dateString != "":
+        # e.g. 1912 to 1920
+        #      1925-12-03 to 1925-12-23
+        if "to" in dateString:
+            startDate, endDate = tuple([part.strip() for part in dateString.split("to", 1)])
+            startDate = getDate(startDate)
+            endDate = getDate(endDate)
+        # e.g. 1912
+        elif len(dateString) == 4:
+            startYear = int(str(dateString))
+            startDate = datetime.datetime(startYear, 1, 1)
+            endDate = datetime.datetime(startYear + 1, 1, 1)
+        # e.g. 3/25/1906
+        # e.g. 1925-12-23
+        else:
+            startDate = getDate(dateString)
+            if startDate is not None:
+                endDate = startDate + datetime.timedelta(days=1)
+
+    return (startDate, endDate)
+
 def getFilenames(fileString, verbose=False):
     """Function for retrieve a list of files given a string."""
     files = []
@@ -171,6 +213,13 @@ def parseQueryString(queryString):
         ors.append(ands)
     return ors
 
+def printProgress(step, total, prepend=""):
+    """Function for printing percentage of progress made"""
+    progress = round(1.0*step/total*100,2)
+    sys.stdout.write('\r')
+    sys.stdout.write(f"{prepend}{progress}%")
+    sys.stdout.flush()
+
 def readCsv(filename, skipLines=0, encoding="utf-8-sig", readDict=True, verbose=True):
     """Function for reading a csv file given a filename string."""
     rows = []
@@ -219,6 +268,44 @@ def removeFiles(listOrString):
         if os.path.isfile(fn):
             os.remove(fn)
 
+def replaceExtension(fn, newExention=".txt"):
+    """Function to return a filename with a new file extention"""
+    pathname = os.path.dirname(fn)
+    return f"{pathname}/{getBasename(fn)}{newExention}"
+
+def sortBy(arr, conditions):
+    """Sort an array by a list of conditions"""
+    if isinstance(conditions, tuple):
+        conditions = [conditions]
+
+    if len(arr) <= 0:
+        return arr
+
+    # Sort array
+    for condition in conditions:
+        key, direction = condition
+        reversed = (direction == "desc")
+        arr = sorted(arr, key=lambda k: k[key], reverse=reversed)
+
+    return arr
+
+
+def sortByQueryString(arr, queryString):
+    """Function to sort an array by query string"""
+    if len(queryString) <= 0:
+        return arr
+
+    conditionStrings = [part.strip() for part in queryString.split(",")]
+    conditions = []
+    for cs in conditionStrings:
+        if "=" in cs:
+            parts = cs.split("=")
+            conditions.append(tuple(parts))
+        else:
+            conditions.append((cs, "asc"))
+
+    return sortBy(arr, conditions)
+
 def stringToFilename(string):
     """Function to convert an arbitrary string to a valid filename string."""
     string = str(string)
@@ -250,6 +337,22 @@ def unzipFile(filename, targetDir=False):
     with zipfile.ZipFile(filename, "r") as r:
         r.extractall(targetDir)
 
+def writeCsv(filename, arr, headings, encoding="utf8", verbose=True):
+    """Function for writing data to a .csv file"""
+    with open(filename, "w", encoding=encoding, newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(headings)
+        for d in arr:
+            row = []
+            for h in headings:
+                value = ""
+                if h in d:
+                    value = d[h]
+                row.append(value)
+            writer.writerow(row)
+    if verbose:
+        print(f"Wrote {len(arr)} rows to {filename}")
+
 def writeJSON(filename, data, verbose=True, pretty=False):
     """Function to write JSON data to file"""
     with open(filename, 'w') as f:
@@ -259,3 +362,8 @@ def writeJSON(filename, data, verbose=True, pretty=False):
             json.dump(data, f)
         if verbose:
             print(f"Wrote data to {filename}")
+
+def writeText(filename, text, encoding="utf8"):
+    """Function to write text data to file"""
+    with open(filename, "w", encoding=encoding, errors="replace") as f:
+        f.write(text)

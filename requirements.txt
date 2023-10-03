@@ -1,0 +1,10 @@
+#
+####### requirements.txt #######
+#
+# Run: pip install -r requirements.txt
+
+# For parsing dates
+dateparser
+
+# For downloading assets from remote URLs
+requests
