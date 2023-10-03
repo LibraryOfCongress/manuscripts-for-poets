@@ -133,7 +133,7 @@ class App {
       });
       // add additional values
       doc.id = i;
-      doc.itemUrl = `https://www.loc.gov/item/${doc.ItemId}/`;
+      doc.itemUrl = `https://www.loc.gov/resource/${doc.ResourceID}/?sp=${doc.ItemAssetIndex}&st=text`;
       return doc;
     });
     this.documents = documents;
