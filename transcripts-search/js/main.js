@@ -116,7 +116,7 @@ class App {
         const xhr = new window.XMLHttpRequest();
         xhr.addEventListener('progress', (evt) => {
           if (evt.lengthComputable) {
-            percentComplete = Math.round((evt.loaded / evt.total) * 100);
+            const percentComplete = Math.round((evt.loaded / evt.total) * 100);
             if (percentComplete !== prevComplete) {
               this.loadingOn(`Loading transcript data... (${percentComplete}%)`);
               prevComplete = percentComplete;
