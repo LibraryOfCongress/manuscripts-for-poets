@@ -1,11 +1,13 @@
 class App {
   constructor(options = {}) {
     const defaults = {
-      project: 'mary-church-terrell-correspondence',
+      project: 'mary-church-terrell',
       q: 'Dearest Mollie',
+      searchLimit: 250,
       wordPad: 8,
     };
-    this.options = _.extend({}, defaults, options);
+    const qparams = StringUtil.queryParams();
+    this.options = _.extend({}, defaults, options, qparams);
     this.init();
   }
 
@@ -165,7 +167,8 @@ class App {
     this.$results.empty();
     this.$item.removeClass('active');
     this.loadingOn(`Looking for keyword "${q}" in transcripts...`);
-    this.searchIndex.searchAsync(q, (results) => {
+    StringUtil.pushURLState({ q });
+    this.searchIndex.searchAsync(q, this.options.searchLimit, (results) => {
       this.renderResults(results, q);
       if (results.length > 0) this.selectItem(results[0]);
       this.loadingOff();
