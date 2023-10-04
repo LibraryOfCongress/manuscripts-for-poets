@@ -64,7 +64,7 @@ class App {
   }
 
   indexTranscriptData(documents) {
-    this.loadingOn('(3 of 3) Data parsed; indexing transcript data...');
+    this.loadingOn('Data parsed; indexing transcript data...');
     const index = new FlexSearch.Index();
     // console.log(documents);
     documents.forEach((document) => {
@@ -109,9 +109,27 @@ class App {
   loadTranscriptData() {
     const dataUrl = `../data/${this.options.project}/transcripts.json`;
     this.transcriptDataPromise = $.Deferred();
-    this.loadingOn('(1 of 3) Loading transcript data...');
-    $.getJSON(dataUrl, (data) => this.parseTranscriptData(data))
-      .fail(() => this.transcriptDataPromise.fail());
+    this.loadingOn('Loading transcript data... (0%)');
+    let prevComplete = 0;
+    $.ajax({
+      xhr: () => {
+        const xhr = new window.XMLHttpRequest();
+        xhr.addEventListener('progress', (evt) => {
+          if (evt.lengthComputable) {
+            percentComplete = Math.round((evt.loaded / evt.total) * 100);
+            if (percentComplete !== prevComplete) {
+              this.loadingOn(`Loading transcript data... (${percentComplete}%)`);
+              prevComplete = percentComplete;
+            }
+          }
+        }, false);
+        return xhr;
+      },
+      type: 'GET',
+      url: dataUrl,
+      success: (data) => this.parseTranscriptData(data),
+      error: this.transcriptDataPromise.fail(),
+    });
     return this.transcriptDataPromise;
   }
 
@@ -125,7 +143,7 @@ class App {
   }
 
   parseTranscriptData(data) {
-    this.loadingOn('(2 of 3) Transcript data loaded; parsing data...');
+    this.loadingOn('Transcript data loaded; parsing data...');
     const { rows, cols, groups } = data;
     const documents = _.map(rows, (row, i) => {
       const doc = _.object(cols, row);
