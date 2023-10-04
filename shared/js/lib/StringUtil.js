@@ -9,7 +9,27 @@ class StringUtil {
     rendered = rendered.replace(/>\s+</g, '><');
     return rendered;
   }
-  
+
+  static pushURLState(data, replace = false) {
+    if (window.history.pushState) {
+      const baseUrl = window.location.href.split('?')[0];
+      const currentState = window.history.state;
+      const urlEncoded = $.param(data);
+      const newUrl = `${baseUrl}?${urlEncoded}`;
+
+      // ignore if state is the same
+      if (currentState) {
+        const currentEncoded = $.param(currentState);
+        const currentUrl = `${baseUrl}?${currentEncoded}`;
+        if (newUrl === currentUrl) return;
+      }
+
+      window.historyInitiated = true;
+      if (replace === true) window.history.replaceState(data, '', newUrl);
+      else window.history.pushState(data, '', newUrl);
+    }
+  }
+
   static queryParams() {
     const searchString = window.location.search;
     if (searchString.length <= 0) return {};
