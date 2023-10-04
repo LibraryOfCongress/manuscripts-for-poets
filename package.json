@@ -2,6 +2,7 @@
   "name": "boilerplate-web-app",
   "description": "My personal boilerplate for starting web apps",
   "scripts": {
+    "gh-deploy": "git subtree push --prefix public gh docs",
     "lint": "./node_modules/.bin/eslint",
     "start": "node server.js"
   },
