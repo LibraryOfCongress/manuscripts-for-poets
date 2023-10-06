@@ -8,3 +8,7 @@ dateparser
 
 # For downloading assets from remote URLs
 requests
+
+# For natural language processing
+spacy
+spacy-language-detection

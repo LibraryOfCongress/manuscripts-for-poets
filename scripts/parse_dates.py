@@ -1,4 +1,4 @@
-"""Script for adding resource metadata to transcript data using cached json data from API"""
+"""Script for retrieving dates from transcripts"""
 
 # -*- coding: utf-8 -*-
 

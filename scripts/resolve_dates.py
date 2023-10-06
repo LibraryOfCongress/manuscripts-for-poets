@@ -42,8 +42,8 @@ def main(a):
         rows = filterByQueryString(rows, a.FILTER)
     
     prevResourceId = None
-    prevEstimatedDateStart = ""
-    prevEstimatedDateEnd = ""
+    prevEstimatedDateStart = None
+    prevEstimatedDateEnd = None
 
     # Retrieve resource data for each row
     for i, row in enumerate(rows):
@@ -62,13 +62,13 @@ def main(a):
         dateIsWithinYear = 1 < deltaDays < 365
         dateIsYear = 365 <= deltaDays <= 366
         dateIsYearRange = deltaDays > 366
-        estimatedDateStart = ""
-        estimatedDateEnd = ""
+        estimatedDateStart = None
+        estimatedDateEnd = None
         estimatedDateConfidence = 0
 
         if dateIsDay:
-            estimatedDateStart = startDate.strftime(dateFormat)
-            estimatedDateEnd = endDate.strftime(dateFormat)
+            estimatedDateStart = startDate
+            estimatedDateEnd = endDate
             estimatedDateConfidence = 99
 
         else:
@@ -87,22 +87,20 @@ def main(a):
             if startDate is not None and endDate is not None and transcriptDate is not None:
                 # parsed a specific date
                 if isSpecificDate(transcriptDate):
-                    estimatedDateStart = transcriptDate.strftime(dateFormat)
-                    transcriptDateEnd = transcriptDate + datetime.timedelta(days=1)
-                    estimatedDateEnd = transcriptDateEnd.strftime(dateFormat)
+                    estimatedDateStart = transcriptDate
+                    estimatedDateEnd = transcriptDate + datetime.timedelta(days=1)
                     estimatedDateConfidence = 75
 
                 # parsed a year and the date metadata is a specific year or within a year
                 elif dateIsWithinYear or dateIsYear:
-                    estimatedDateStart = startDate.strftime(dateFormat)
-                    estimatedDateEnd = endDate.strftime(dateFormat)
+                    estimatedDateStart = startDate
+                    estimatedDateEnd = endDate
                     estimatedDateConfidence = 90
 
                 # parsed a year
                 else:
-                    estimatedDateStart = transcriptDate.strftime(dateFormat)
-                    transcriptDateEnd = datetime.datetime(transcriptDate.year + 1, transcriptDate.month, transcriptDate.day)
-                    estimatedDateEnd = transcriptDateEnd.strftime(dateFormat)
+                    estimatedDateStart = transcriptDate
+                    estimatedDateEnd = datetime.datetime(transcriptDate.year + 1, transcriptDate.month, transcriptDate.day)
                     estimatedDateConfidence = 50
 
             # if date range is greater than a year and not first in sequence, inheret the previous date
@@ -113,16 +111,19 @@ def main(a):
 
             # No date is available, defer to metadata date
             elif startDate is not None or endDate is not None:
-                estimatedDateStart = startDate.strftime(dateFormat)
-                estimatedDateEnd = endDate.strftime(dateFormat)
+                estimatedDateStart = startDate
+                estimatedDateEnd = endDate
                 estimatedDateConfidence = 90
 
         prevEstimatedDateStart = estimatedDateStart
         prevEstimatedDateEnd = estimatedDateEnd
 
-        rows[i]["EstimatedDateStart"] = estimatedDateStart
-        rows[i]["EstimatedDateEnd"] = estimatedDateEnd
+        rows[i]["EstimatedDateStart"] = estimatedDateStart.strftime(dateFormat) if estimatedDateStart is not None else ""
+        rows[i]["EstimatedDateEnd"] = estimatedDateEnd.strftime(dateFormat) if estimatedDateEnd is not None else ""
         rows[i]["EstimatedDateConfidence"] = estimatedDateConfidence
+
+        deltaDays = (estimatedDateEnd - estimatedDateStart).days
+        rows[i]["EstimatedYear"] = estimatedDateStart.year if deltaDays < (365 * 1.5) else ""
         
         printProgress(i+1, rowCount, "Progress: ")
 
@@ -130,7 +131,7 @@ def main(a):
         return
 
     # Add fields to new data
-    fieldsToAdd = ["EstimatedDateStart", "EstimatedDateEnd", "EstimatedDateConfidence"]
+    fieldsToAdd = ["EstimatedDateStart", "EstimatedDateEnd", "EstimatedDateConfidence", "EstimatedYear"]
     for field in fieldsToAdd:
         if field not in fieldnames:
             fieldnames.append(field)
