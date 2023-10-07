@@ -19,9 +19,7 @@ def parseArgs():
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
     parser.add_argument("-filter", dest="FILTER", default="", help="Filter query string; leave blank if no filter")
     parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_lemmas.csv", help="Output csv file")
-    parser.add_argument("-cache", dest="CACHE_DIR", default="tmp/nlp_transcripts/", help="Folder for caching document nlp")
     parser.add_argument("-debug", dest="DEBUG", action="store_true", help="Debug?")
-    parser.add_argument("-clean", dest="CLEAN", action="store_true", help="Clear the cache before running?")
     args = parser.parse_args()
     return args
 
@@ -30,10 +28,6 @@ def main(a):
 
     # Make sure output dirs exist
     makeDirectories(a.OUTPUT_FILE)
-    makeDirectories(a.CACHE_DIR)
-
-    if a.CLEAN:
-        emptyDirectory(a.CACHE_DIR)
 
     fieldnames, rows = readCsv(a.INPUT_FILE)
     rowCount = len(rows)
@@ -93,24 +87,7 @@ def main(a):
                             "Colored man ten years ago now "
                             "has 60000 followers. His name is Crowdy") 
         
-        tmpFile = f"{a.CACHE_DIR}doc-{row['Index']}.json"
-        doc = None
-
-        if a.DEBUG:
-            doc = nlp(transcript)
-
-        else:
-            # Read document from cache if exists
-            if os.path.isfile(tmpFile):
-                doc_json = readJSON(tmpFile)
-                doc = Doc(nlp.vocab).from_json(doc_json)
-
-            # Otherwise, run NLP and cache the result
-            else:
-                doc = nlp(transcript)
-                doc_json = doc.to_json()
-                writeJSON(tmpFile, doc_json)
-
+        doc = nlp(transcript)
         tokenCount = len(doc)
         docLemmas = []
         for j, token in enumerate(doc):
