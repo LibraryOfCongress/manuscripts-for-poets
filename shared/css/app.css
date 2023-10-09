@@ -72,6 +72,7 @@ main {
   box-sizing: border-box;
   padding: 1rem;
   flex-grow: 1;
+  position: relative;
 }
 
 .loc-header {
@@ -85,6 +86,7 @@ main {
   align-items: center;
   background: var(--bg-base-darkest);
   border-bottom: 1px solid var(--bg-base-darker);
+  z-index: 1000;
 }
 .loc-header p {
   color: var(--text-base-lightest);
@@ -126,6 +128,7 @@ main {
   padding: 0 12px 12px;
   text-align: center;
   font-size: 0.9rem;
+  position: relative;
 }
 .loc-footer .loc-footer-nav-list {
   display: flex;
