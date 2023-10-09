@@ -65,6 +65,16 @@ button path,
   overflow: hidden;
   overflow-x: auto;
 }
+.timeline-data .data-wrapper {
+  display: flex;
+}
+.timeline-data .data-wrapper .year {
+  box-sizing: border-box;
+  border-right: 1px solid var(--bg-base-dark);
+  flex-basis: 400px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
 
 .sub-collection {
   height: 33vh;
