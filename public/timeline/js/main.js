@@ -118,17 +118,17 @@ class App {
       const currentValue = parseInt($el.val(), 10);
       if (prevValue === currentValue) return;
       $el.attr('data-value', currentValue);
-      const $subCollection = $el.closest('.sub-collection');
-      const $timeline = $subCollection.find('.data-wrapper');
+      const $timeline = $($el.attr('data-target'));
       this.renderSubCollectionTimeline($timeline, timelineData[currentValue].years);
     });
   }
 
   renderYears() {
     const { timelineData } = this;
-    const yearCount = timelineData[0].length;
+    const yearCount = timelineData[0].years.length;
     const wrapperWidth = yearCount * 400;
-    $('.data-wrapper').css('width', `${wrapperWidth}px`);
+    console.log(wrapperWidth);
+    $('.timeline-wrapper').css('width', `${wrapperWidth}px`);
   }
 }
 

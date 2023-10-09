@@ -10,14 +10,25 @@ button path,
   background: var(--bg-base-darker);
   color: var(--text-base-lightest);
 }
+.timeline-labels {
+  flex-basis: 200px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-right: 1px solid var(--bg-base-dark);
+}
+.timeline {
+  flex-grow: 1;
+  overflow: hidden;
+  overflow-x: auto;
+  position: relative;
+}
 .toolbar {
   flex-basis: 50px;
   flex-grow: 0;
   flex-shrink: 0;
 }
-.timeline {
-  flex-grow: 1;
-}
+
 
 .toolbar {
   background: rgba(0, 0, 0, 0.3);
@@ -31,21 +42,12 @@ button path,
   margin: 6px 0 0;
 }
 
-.timeline-row {
-  display: flex;
-  align-items: stretch;
-  box-sizing: border-box;
-  border-bottom: 2px solid var(--bg-base-dark);
-}
-.timeline-row .timeline-label {
-  flex-basis: 200px;
-  flex-grow: 0;
-  flex-shrink: 0;
+.timeline-label {
   display: flex;
   flex-direction: column;
   justify-content: center;
   box-sizing: border-box;
-  border-right: 2px solid var(--bg-base-dark);
+  border-bottom: 2px solid var(--bg-base-dark);
   padding: 6px;
   overflow: hidden;
 }
@@ -58,22 +60,32 @@ button path,
   /* hide text that can't wrap with an ellipsis */
   overflow: hidden;
   text-overflow: ellipsis;
+}
 
+.timeline-wrapper {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
 }
-.timeline-row .timeline-data {
-  flex-grow: 1;
-  overflow: hidden;
-  overflow-x: auto;
-}
-.timeline-data .data-wrapper {
+.timeline-row {
+  width: 100%;
   display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  border-bottom: 2px solid var(--bg-base-dark);
 }
-.timeline-data .data-wrapper .year {
+.timeline-row .year {
   box-sizing: border-box;
   border-right: 1px solid var(--bg-base-dark);
   flex-basis: 400px;
   flex-grow: 0;
   flex-shrink: 0;
+  overflow: hidden;
+}
+.timeline-row button.word {
+  font-size: 0.7rem;
+  padding: 2px 4px;
 }
 
 .sub-collection {
@@ -84,6 +96,6 @@ button path,
   height: 10vh;
   min-height: 60px;
 }
-.time-labels {
+.years {
   height: 40px;
 }
