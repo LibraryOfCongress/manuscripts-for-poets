@@ -4,6 +4,7 @@
 
 import argparse
 import collections
+from pprint import pprint
 
 from utilities import *
 
@@ -79,6 +80,16 @@ def main(a):
     print("Prepping data for output")
     lemmasOut = unique(lemmasOut)
     print(f"{len(lemmasOut)} lemmas matched for interface")
+    # Replace words with word indices
+    for i, container in enumerate(containers):
+        for j, year in enumerate(container["years"]):
+            updatedLemmas = []
+            for lemmaText, count in year["lemmas"]:
+                lemmaIndex = lemmasOut.index(lemmaText)
+                updatedLemmas.append((lemmaIndex, count))
+            containers[i]["years"][j]["lemmas"] = updatedLemmas
+
+    # expand lemmas
     lemmasOut = [next(l for l in lemmas if l["lemma"] == lemma) for lemma in lemmasOut]
 
     docCols = ["ResourceID", "Project", "DownloadUrl", "Transcription", "ItemAssetIndex", "EstimatedYear"]
