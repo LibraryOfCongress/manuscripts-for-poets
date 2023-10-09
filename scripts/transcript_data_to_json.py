@@ -38,24 +38,8 @@ def main(a):
     cols = [field for field in cols if field in fieldnames]
     colGroups = [field.strip() for field in a.GROUP_FIELDS.split(",")]
     colGroups = [field for field in colGroups if field in fieldnames]
-    groups = {}
-    for field in colGroups:
-        groups[field] = []
 
-    # Retrieve data from each page
-    rows = []
-    for page in pages:
-        row = []
-        for col in cols:
-            value = page[col]
-            # check if we should group this value to reduce redudancy and save file size
-            if col in colGroups:
-                groupValues = groups[col]
-                if value not in groupValues:
-                    groupValues.append(value)
-                value = groupValues.index(value)
-            row.append(value)
-        rows.append(row)
+    rows, groups = unzipList(pages, cols, colGroups)
 
     # Write JSON to file
     jsonOut = {

@@ -13,6 +13,11 @@ import zipfile
 
 import requests
 
+def appendToFilename(filename, append):
+    """Function to append a string to a filename, retaining the file extension"""
+    basename, fileExt = os.path.splitext(filename)
+    return f"{basename}{append}{fileExt}"
+
 def copyFile(src, dst):
     """Function copying file from src to dst."""
     shutil.copyfile(src, dst)
@@ -336,6 +341,26 @@ def unzipFile(filename, targetDir=False):
         targetDir = filename[:-4] # assuming the filepath ends with .zip
     with zipfile.ZipFile(filename, "r") as r:
         r.extractall(targetDir)
+
+def unzipList(arr, cols, colGroups):
+    """Break out a list of objects into rows and columns"""
+    groups = {}
+    for field in colGroups:
+        groups[field] = []
+    rows = []
+    for item in arr:
+        row = []
+        for col in cols:
+            value = item[col]
+            # check if we should group this value to reduce redudancy and save file size
+            if col in colGroups:
+                groupValues = groups[col]
+                if value not in groupValues:
+                    groupValues.append(value)
+                value = groupValues.index(value)
+            row.append(value)
+        rows.append(row)
+    return (rows, groups)
 
 def writeCsv(filename, arr, headings, encoding="utf8", verbose=True):
     """Function for writing data to a .csv file"""

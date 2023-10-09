@@ -3,10 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
-from pprint import pprint
 import spacy
-from spacy.tokens import Doc
 
 from utilities import *
 

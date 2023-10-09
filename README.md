@@ -14,7 +14,7 @@ For Natural Language Processing, also download your language [model(s)](https://
 
 ```
 python -m spacy download en_core_web_lg
-python -m spacy download fr_dep_news_lg
-python -m spacy download de_dep_news_lg
+python -m spacy download fr_core_news_lg
+python -m spacy download de_core_news_lg
 python -m spacy download it_core_news_lg
 ```
