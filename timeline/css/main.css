@@ -39,6 +39,8 @@ button path,
   flex-basis: 50px;
   flex-grow: 0;
   flex-shrink: 0;
+  box-sizing: border-box;
+  border-left: 1px solid var(--bg-base-dark);
 }
 
 .toolbar {
@@ -135,6 +137,7 @@ button path,
   font-size: 0.7rem;
   white-space: nowrap;
   background: var(--bg-base-darkest);
+  color: var(--bg-base-lighter);
 }
 .timeline-row.notes .note span {
   display: inline-block;
@@ -159,7 +162,6 @@ button path,
 .timeline-row.notes .note:nth-child(5n + 4) {
   top: 80px;
 }
-
 
 .sub-collections {
   flex-grow: 1;
