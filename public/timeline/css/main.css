@@ -123,6 +123,43 @@ button path,
   flex-shrink: 0;
   overflow: hidden;
 }
+.timeline-row.notes {
+  position: relative;
+  background: var(--bg-base-darkest);
+}
+.timeline-row.notes .note {
+  position: absolute;
+  top: 0;
+  height: 20px;
+  line-height: 20px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  background: var(--bg-base-darkest);
+}
+.timeline-row.notes .note span {
+  display: inline-block;
+  vertical-align: middle;
+}
+.timeline-row.notes .note .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffdf40;
+  margin-right: 2px;
+}
+.timeline-row.notes .note:nth-child(5n + 1) {
+  top: 20px;
+}
+.timeline-row.notes .note:nth-child(5n + 2) {
+  top: 40px;
+}
+.timeline-row.notes .note:nth-child(5n + 3) {
+  top: 60px;
+}
+.timeline-row.notes .note:nth-child(5n + 4) {
+  top: 80px;
+}
+
 
 .sub-collections {
   flex-grow: 1;
@@ -130,8 +167,8 @@ button path,
   flex-direction: column;
   align-items: stretch;
 }
-.biography {
-  flex-basis: 80px;
+.notes {
+  flex-basis: 100px;
   flex-grow: 0;
   flex-shrink: 0;
 }
