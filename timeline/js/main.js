@@ -56,6 +56,14 @@ class App {
 
     annotations.forEach((note) => {
       const { dateStart, dateEnd, event } = note;
+      const delta = dateEnd - dateStart;
+      const leftN = MathUtil.norm(dateStart + 0.4, yearStart, yearEnd + 1);
+      const left = leftN * 100;
+      const text = delta > 0 ? `(${dateStart} - ${dateEnd}) ${event}` : `(${dateStart}) ${event}`;
+      notesHTML += `<div class="note" style="left: ${left}%">`;
+      notesHTML += '<span class="dot"></span>';
+      notesHTML += `<span class="text">${text}</span>`;
+      notesHTML += '</div>';
     });
 
     timelineData.forEach((item, i) => {
@@ -86,6 +94,7 @@ class App {
     $('.timeline-labels .sub-collections').html(labelsHTML);
     $('.timeline-wrapper .sub-collections').html(timelineHTML);
     $('.timeline-row.years').html(yearsHTML);
+    $('.timeline-row.notes').html(notesHTML);
   }
 }
 
