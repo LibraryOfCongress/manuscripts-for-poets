@@ -15,7 +15,7 @@ def parseArgs():
     # pylint: disable=line-too-long
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file that has been run through: add_resource_data_to_transcript_data.py and parse_dates.py and resolve_dates.py")
-    parser.add_argument("-lemma", dest="LEMMA_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_lemmas.csv", help="A lemma .csv file generated via nlp_transcripts.py")
+    parser.add_argument("-notes", dest="ANNOTATION_FILE", default="data/mary-church-terrell-biographical-notes.csv", help="A .csv with annotations to the timeline")
     parser.add_argument("-out", dest="OUTPUT_FILE", default="public/data/mary-church-terrell/timeline.json", help="Output JSON file")
     args = parser.parse_args()
     return args
@@ -28,25 +28,17 @@ def main(a):
 
     # Read data from .csv file
     pFields, docs = readCsv(a.INPUT_FILE)
-    lFields, lemmas = readCsv(a.LEMMA_FILE)
+    nFields, notes = readCsv(a.ANNOTATION_FILE)
 
     # Parse docs
     for i, doc in enumerate(docs):
         docs[i]["Index"] = int(doc["Index"])
         docs[i]["EstimatedYear"] = int(doc["EstimatedYear"]) if doc["EstimatedYear"] != "" else None
-        docs[i]["Lemmas"] = []
-    validYears = [d["EstimatedYear"] for d in docs if d["EstimatedYear"] is not None]
+    docs = [d for d in docs if d["EstimatedYear"] is not None]
+    validYears = [d["EstimatedYear"] for d in docs]
     print(f"{len(validYears)} docs with valid years")
     startYear, endYear = (min(validYears), max(validYears))
     print(f"Year range: {startYear} - {endYear}")
-
-    # Parse lemmas
-    for i, lemma in enumerate(lemmas):
-        lemmaDocs = [int(dindex) for dindex in lemma["docs"].split(";")]
-        for docIndex in lemmaDocs:
-            docs[docIndex]["Lemmas"].append(lemma["lemma"])
-        lemmas[i]["docs"] = lemmaDocs
-    print(f"POS: {unique([l['pos'] for l in lemmas])}")
 
     containersNames = unique([d["Project"] for d in docs])
     print(f"{len(containersNames)} containers: {containersNames}")
@@ -54,69 +46,43 @@ def main(a):
     # Build containers for the timeline
     print("Building timeline...")
     containers = []
-    lemmasOut = []
+    counts = []
     for containerName in containersNames:
         containerYears = []
         for year in range(startYear, endYear + 1):
             matches = [d["Index"] for d in docs if d["EstimatedYear"] == year and d["Project"] == containerName]
-            containerYearLemmas = []
-            for docIndex in matches:
-                containerYearLemmas += docs[docIndex]["Lemmas"]
-            containerYearLemmas = sorted(containerYearLemmas)
-            counter = collections.Counter(containerYearLemmas)
-            frequencies = counter.most_common(100)
-            containerYears.append({
-                "year": year,
-                "count": len(matches),
-                "lemmas": frequencies
-            })
-            lemmasOut += [lemma for lemma, count in frequencies]
+            count = len(matches)
+            containerYear = {
+               "year": year,
+               "count": count,
+               "docs": matches
+            }
+            counts.append(count)
+            containerYears.append(containerYear)
         container = {
             "title": containerName,
             "years": containerYears
         }
         containers.append(container)
 
-    print("Prepping data for output")
-    lemmasOut = unique(lemmasOut)
-    print(f"{len(lemmasOut)} lemmas matched for interface")
-    # Replace words with word indices
+    # Add normalized counts
+    maxCount = max(counts)
     for i, container in enumerate(containers):
-        for j, year in enumerate(container["years"]):
-            updatedLemmas = []
-            for lemmaText, count in year["lemmas"]:
-                lemmaIndex = lemmasOut.index(lemmaText)
-                updatedLemmas.append((lemmaIndex, count))
-            containers[i]["years"][j]["lemmas"] = updatedLemmas
-
-    # expand lemmas
-    lemmasOut = [next(l for l in lemmas if l["lemma"] == lemma) for lemma in lemmasOut]
-
-    docCols = ["ResourceID", "Project", "DownloadUrl", "Transcription", "ItemAssetIndex", "EstimatedYear"]
-    for i, doc in enumerate(docs):
-        if doc["EstimatedYear"] is None:
-            for col in docCols:
-                docs[i][col] = ""
-    docRows, docGroups = unzipList(docs, docCols, ["ResourceID", "Project"])
-    lemmaCols = ["lemma", "pos", "ent"]
-    lemmaRows, lemmaGroups = unzipList(lemmasOut, lemmaCols, ["pos", "ent"])
-
-    docFilename = appendToFilename(a.OUTPUT_FILE, "-transcripts")
-    lemmaFilename = appendToFilename(a.OUTPUT_FILE, "-words")
-    timelineFilename = a.OUTPUT_FILE
-
+        for j, containerYear in enumerate(container["years"]):
+            countN = 1.0 * containerYear["count"] / maxCount
+            containers[i]["years"][j]["countN"] = round(countN, 3)
+            containers[i]["years"][j]["color"] = valueToColor(lerp((0.2, 1), countN))
     print("Writing files to disk...")
-    # Write JSON to file
-    writeJSON(docFilename, {
-        "cols": docCols,
-        "rows": docRows,
-        "groups": docGroups
-    })
-    writeJSON(lemmaFilename, {
-        "cols": lemmaCols,
-        "rows": lemmaRows,
-        "groups": lemmaGroups
-    })
-    writeJSON(timelineFilename, containers)
+
+    for i, note in enumerate(notes):
+        notes[i]["dateStart"] = int(note["dateStart"])
+        notes[i]["dateEnd"] = int(note["dateEnd"]) if note["dateEnd"] != "" else notes[i]["dateStart"]
+
+    dataOut = {
+        "collections": containers,
+        "range": [startYear, endYear],
+        "annotations": notes
+    }
+    writeJSON(a.OUTPUT_FILE, dataOut)
 
 main(parseArgs())

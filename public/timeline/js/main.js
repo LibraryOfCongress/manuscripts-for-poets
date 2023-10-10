@@ -11,124 +11,81 @@ class App {
   }
 
   init() {
-    this.$subCollectionSelects = $('.select-sub-collection');
-
     const timelineDataURL = `../data/${this.options.project}/timeline.json`;
-    const timelineWordsURL = `../data/${this.options.project}/timeline-words.json`;
-    const timelineTranscriptsURL = `../data/${this.options.project}/timeline-transcripts.json`;
     const timelineDataPromise = $.getJSON(timelineDataURL, (data) => data);
-    const timelineWordsPromise = $.getJSON(timelineWordsURL, (data) => data);
-    const timelineTranscriptPromise = $.getJSON(timelineTranscriptsURL, (data) => data);
 
-    $.when(timelineDataPromise, timelineWordsPromise).done((timelineData, wordsData) => {
-      this.onTimelineDataLoad(timelineData[0], wordsData[0]);
-    });
-
-    $.when(timelineTranscriptPromise).done((transcriptData) => {
-      this.onTranscriptDataLoad(transcriptData);
+    $.when(timelineDataPromise).done((timelineData) => {
+      this.onTimelineDataLoad(timelineData);
     });
   }
 
-  loadListeners() {
-    this.$subCollectionSelects.on('change', (e) => {
-      this.onChangeSubCollection();
+  static loadListeners() {
+    const $timeline = $('.timeline').first();
+    const [timeline] = $timeline;
+    $timeline.on('wheel', (e) => {
+      e.preventDefault();
+      if (e.originalEvent.deltaY > 0) timeline.scrollLeft += 100;
+      else timeline.scrollLeft -= 100;
     });
   }
 
-  onChangeSubCollection() {
-    const { $subCollectionSelects } = this;
-  }
-
-  onTimelineDataLoad(timelineData, wordsData) {
+  onTimelineDataLoad(timelineData) {
     console.log('Timeline data loaded.');
 
-    const { rows, cols, groups } = wordsData;
-    const words = _.map(rows, (row, i) => {
-      const word = _.object(cols, row);
-      // parse grouped values
-      _.each(groups, (values, field) => {
-        word[field] = values[word[field]];
-      });
-      // add additional values
-      word.id = i;
-      return word;
-    });
-    this.words = words;
-    this.timelineData = timelineData;
+    this.timelineData = timelineData.collections;
+    this.timelineRange = timelineData.range;
+    this.annotations = timelineData.annotations;
 
-    this.renderSubCollections();
-    this.renderYears();
-    this.loadListeners();
     this.renderTimelne();
-  }
-
-  onTranscriptDataLoad(data) {
-    console.log('Transcript data loaded.');
-    const { rows, cols, groups } = data;
-    const documents = _.map(rows, (row, i) => {
-      const doc = _.object(cols, row);
-      // parse grouped values
-      _.each(groups, (values, field) => {
-        doc[field] = values[doc[field]];
-      });
-      // add additional values
-      doc.id = i;
-      doc.itemUrl = `https://www.loc.gov/resource/${doc.ResourceID}/?sp=${doc.ItemAssetIndex}&st=text`;
-      return doc;
-    });
-    this.documents = documents;
-  }
-
-  renderSubCollections() {
-    const { timelineData, $subCollectionSelects } = this;
-    $subCollectionSelects.each((i, el) => {
-      const $el = $(el);
-      let html = '';
-      const defaultValue = this.options[`subCollection${i}`];
-      timelineData.forEach((container, j) => {
-        const selected = defaultValue === j ? ' selected' : '';
-        html += `<option value="${j}"${selected}>${container.title}</option>`;
-      });
-      $el.html(html);
-    });
-  }
-
-  renderSubCollectionTimeline($timeline, years) {
-    const { words } = this;
-    let html = '';
-    years.forEach((yearData) => {
-      const { year, lemmas } = yearData;
-      html += `<div class="year" data-year="${year}">`;
-      lemmas.forEach((wordData) => {
-        const [wordIndex, count] = wordData;
-        const word = words[wordIndex];
-        html += `<button class="word">${word.lemma}</button>`;
-      });
-      html += '</div>';
-    });
-    $timeline.html(html);
+    this.constructor.loadListeners();
   }
 
   renderTimelne() {
-    const { timelineData, $subCollectionSelects } = this;
+    const { timelineData, annotations } = this;
+    const [yearStart, yearEnd] = this.timelineRange;
+    let labelsHTML = '';
+    let timelineHTML = '';
+    let yearsHTML = '';
+    let notesHTML = '';
+    const yearCount = yearEnd - yearStart + 1;
 
-    $subCollectionSelects.each((i, el) => {
-      const $el = $(el);
-      const prevValue = parseInt($el.attr('data-value'), 10);
-      const currentValue = parseInt($el.val(), 10);
-      if (prevValue === currentValue) return;
-      $el.attr('data-value', currentValue);
-      const $timeline = $($el.attr('data-target'));
-      this.renderSubCollectionTimeline($timeline, timelineData[currentValue].years);
+    _.times(yearCount, (j) => {
+      const year = yearStart + j;
+      yearsHTML += `<div class="year">${year}</div>`;
     });
-  }
 
-  renderYears() {
-    const { timelineData } = this;
-    const yearCount = timelineData[0].years.length;
-    const wrapperWidth = yearCount * 400;
-    console.log(wrapperWidth);
-    $('.timeline-wrapper').css('width', `${wrapperWidth}px`);
+    annotations.forEach((note) => {
+      const { dateStart, dateEnd, event } = note;
+    });
+
+    timelineData.forEach((item, i) => {
+      const { title, years } = item;
+      labelsHTML += '<div class="sub-collection timeline-label">';
+      labelsHTML += `<h3>${title}</h3>`;
+      labelsHTML += '</div>';
+
+      timelineHTML += '<div class="timeline-row sub-collection">';
+      years.forEach((yearData) => {
+        const {
+          year,
+          countN,
+          count,
+          color,
+        } = yearData;
+        const textColor = countN > 0.5 ? '#000' : '#fff';
+        if (countN <= 0) {
+          timelineHTML += '<div class="year">0</div>';
+        } else {
+          timelineHTML += `<button class="year" data-year="${year}" data-subcollection="${i}" style="background: ${color}; color: ${textColor}">${count.toLocaleString()}</button>`;
+        }
+      });
+      timelineHTML += '</div>';
+    });
+
+    $('.timeline-wrapper').css('width', `${yearCount * 40}px`);
+    $('.timeline-labels .sub-collections').html(labelsHTML);
+    $('.timeline-wrapper .sub-collections').html(timelineHTML);
+    $('.timeline-row.years').html(yearsHTML);
   }
 }
 

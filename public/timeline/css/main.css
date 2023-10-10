@@ -1,3 +1,7 @@
+.loc-header {
+  border-bottom: 3px solid var(--bg-base-lightest);
+}
+
 button path,
 .button path {
   fill: var(--text-base-lightest);
@@ -10,12 +14,20 @@ button path,
   background: var(--bg-base-darker);
   color: var(--text-base-lightest);
 }
+.timeline-labels,
+.timeline,
+.toolbar {
+  padding-bottom: 18px;
+}
 .timeline-labels {
-  flex-basis: 200px;
+  flex-basis: 120px;
   flex-grow: 0;
   flex-shrink: 0;
   box-sizing: border-box;
   border-right: 1px solid var(--bg-base-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 .timeline {
   flex-grow: 1;
@@ -28,7 +40,6 @@ button path,
   flex-grow: 0;
   flex-shrink: 0;
 }
-
 
 .toolbar {
   background: rgba(0, 0, 0, 0.3);
@@ -49,17 +60,11 @@ button path,
   box-sizing: border-box;
   border-bottom: 2px solid var(--bg-base-dark);
   padding: 6px;
-  overflow: hidden;
 }
-.timeline-label select {
-  max-width: 100%;
-  overflow: hidden;
-}
-.timeline-label option {
-  white-space: pre-wrap;
-  /* hide text that can't wrap with an ellipsis */
-  overflow: hidden;
-  text-overflow: ellipsis;
+.timeline-label h3,
+.timeline-label {
+  font-size: 0.8rem;
+  margin: 0;
 }
 
 .timeline-wrapper {
@@ -67,6 +72,12 @@ button path,
   height: 100%;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.timeline-wrapper .sub-collections {
+  width: 100%;
 }
 .timeline-row {
   width: 100%;
@@ -75,27 +86,57 @@ button path,
   box-sizing: border-box;
   border-bottom: 2px solid var(--bg-base-dark);
 }
+.timeline-row button.year,
 .timeline-row .year {
+  padding: 0;
+  margin: 0;
+  border: none;
   box-sizing: border-box;
   border-right: 1px solid var(--bg-base-dark);
-  flex-basis: 400px;
+  flex-basis: 40px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.timeline-row.sub-collection .year {
+  color: var(--bg-base);
+  background: black;
+}
+.timeline-row button.year:hover,
+.timeline-row button.year:active {
+  border: 2px solid rgba(255, 255, 255, 0.667);
+}
+.timeline-row.years .year {
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 0.7rem;
+}
+.timeline-row,
+.timeline-label {
+  flex-basis: 48px;
   flex-grow: 0;
   flex-shrink: 0;
   overflow: hidden;
 }
-.timeline-row button.word {
-  font-size: 0.7rem;
-  padding: 2px 4px;
-}
 
-.sub-collection {
-  height: 33vh;
-  min-height: 200px;
+.sub-collections {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 .biography {
-  height: 10vh;
-  min-height: 60px;
+  flex-basis: 80px;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 .years {
-  height: 40px;
+  flex-basis: 40px;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
