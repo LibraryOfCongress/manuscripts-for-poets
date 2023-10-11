@@ -14,11 +14,11 @@ def parseArgs():
     # pylint: disable=line-too-long
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="TRANSCRIPT", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_correspondence.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
-    parser.add_argument("-filter", dest="FILTER", default="Project=Family letters AND AssetStatus=completed", help="Filter query string; leave blank if no filter")
+    parser.add_argument("-filter", dest="FILTER", default="", help="Filter query string; leave blank if no filter")
     parser.add_argument("-include", dest="INCLUDE_FIELDS", default="", help="Fields to include; leave blank if all")
     parser.add_argument("-exclude", dest="EXCLUDE_FIELDS", default="", help="Fields to exclude; leave blank if none")
-    parser.add_argument("-sort", dest="SORT", default="Date,Undated", help="Sort query string; leave blank if no sort")
-    parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_correspondence_family.csv", help="Output csv file")
+    parser.add_argument("-sort", dest="SORT", default="", help="Sort query string; leave blank if no sort")
+    parser.add_argument("-out", dest="OUTPUT_FILE", default="", help="Output csv file")
     parser.add_argument("-probe", dest="PROBE", action="store_true", help="Just output details; do not process data")
     args = parser.parse_args()
     return args
