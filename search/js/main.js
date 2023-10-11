@@ -40,29 +40,6 @@ class App {
     });
   }
 
-  static getHighlightedText(text, textToHighlight, wordsBeforeCount, wordsAfterCount) {
-    const regex = new RegExp(textToHighlight.split(/\s+/).filter((i) => i?.length).join('|'), 'gi');
-    const textNormalized = text.replace(/\s+/g, ' ');
-    const result = textNormalized.replace(regex, (match) => `<strong>${match}</strong>`);
-    const resultNormalized = result.replaceAll(/<\/strong>\s*<strong>/gi, ' ');
-    const indexStart = resultNormalized.indexOf('<strong>');
-    const indexEnd = resultNormalized.indexOf('</strong>') + '</strong>'.length;
-    const textBefore = resultNormalized.substring(0, indexStart).trim().replaceAll(/<\/?strong>/gi, '');
-    const textAfter = resultNormalized.substring(indexEnd).trim().replaceAll(/<\/?strong>/gi, '');
-    let wordsBefore = textBefore.split(' ');
-    let wordsAfter = textAfter.split(' ');
-    if (wordsBefore.length > wordsBeforeCount) {
-      wordsBefore = wordsBefore.slice(wordsBefore.length - wordsBeforeCount, wordsBefore.length);
-    }
-    if (wordsAfter.length > wordsAfterCount) {
-      wordsAfter = wordsAfter.slice(0, wordsAfterCount);
-    }
-    let highlighted = `${wordsBefore.join(' ')} `;
-    highlighted += resultNormalized.substring(indexStart, indexEnd);
-    highlighted += ` ${wordsAfter.join(' ')}`;
-    return highlighted;
-  }
-
   indexTranscriptData(documents) {
     this.loadingOn('Data parsed; indexing transcript data...');
     const index = new FlexSearch.Index();
@@ -154,13 +131,13 @@ class App {
   }
 
   renderResults(results, query) {
-    this.$message.html(`There are <strong>${results.length} results</strong> for ${query}" in the transcript data.`);
+    this.$message.html(`There are <strong>${results.length} results</strong> for "${query}" in the transcript data.`);
     let html = '';
     const { wordPad } = this.options;
     results.forEach((result, i) => {
       const document = this.documents[result];
       const text = document.Transcription;
-      const matchText = this.constructor.getHighlightedText(text, query, wordPad, wordPad);
+      const matchText = StringUtil.getHighlightedText(text, query, wordPad, wordPad);
       const data = {
         className: i > 0 ? '' : 'selected',
         id: result,

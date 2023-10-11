@@ -13,6 +13,7 @@ button path,
   padding: 0;
   background: var(--bg-base-darker);
   color: var(--text-base-lightest);
+  overflow: hidden;
 }
 .timeline-labels,
 .timeline,
@@ -48,11 +49,90 @@ button path,
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 .toolbar button,
 .toolbar button.button + button.button {
   display: block;
   margin: 6px 0 0;
+}
+.toolbar .search-results {
+  position: absolute;
+  width: 400px;
+  height: 100%;
+  right: -400px;
+  top: 0;
+  background: var(--bg-base-lighter);
+  box-sizing: border-box;
+  border: 1px solid var(--bg-base-light);
+  color: var(--text-base-darkest);
+  padding: 12px;
+  transition: right 0.5s ease-in-out;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.toolbar .search-results.active {
+  right: 0;
+}
+.search-results .close-search-results {
+  position: absolute;
+  top: 0;
+  right: 3px;
+}
+.search-results .search-message {
+  margin: 24px 0 10px;
+}
+.search-results-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.search-results-list li {
+  padding: 4px 8px;
+  border-bottom: 3px solid var(--bg-base-darker);
+  position: relative;
+}
+.search-results-list li.selected {
+  background: var(--bg-base-darkest);
+  color: var(--text-base-lightest);
+}
+.search-results-list .select-item:hover {
+  background: var(--bg-base-darkest);
+  color: var(--text-base-lightest);
+}
+.search-results-list li h3,
+.search-results-list li p {
+  margin: 0 70px 0 0;
+  font-size: 0.9rem;
+}
+.search-results-list li h3 {
+  font-size: 0.7rem;
+  color: var(--bg-base-darker);
+  font-style: italic;
+  font-weight: normal;
+  border-bottom: 1px solid var(--bg-base-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search-results-list li p {
+  padding: 8px 0;
+}
+.search-results-list li.selected h3 {
+  color: var(--text-base-lightest);
+}
+.search-results-list li .select-item {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+.search-results-list li.selected .select-item {
+  display: none;
+}
+.search-results-list li strong {
+  font-weight: bold;
+  background: #fadf15;
+  color: var(--text-base-darkest);
 }
 
 .timeline-label {
