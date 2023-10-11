@@ -171,7 +171,7 @@ class App {
         } = yearData;
         const textColor = countN > 0.5 ? '#000' : '#fff';
         if (countN <= 0) {
-          timelineHTML += '<div class="year">0</div>';
+          timelineHTML += '<div class="year"></div>';
         } else {
           timelineHTML += `<button class="year" data-year="${year}" data-subcollection="${i}" style="background: ${color}; color: ${textColor}">${count.toLocaleString()}</button>`;
         }
