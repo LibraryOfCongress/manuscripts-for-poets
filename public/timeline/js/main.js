@@ -4,6 +4,7 @@ class App {
       project: 'mary-church-terrell',
       subCollection0: 2,
       subCollection1: 4,
+      wordPad: 10,
     };
     const qparams = StringUtil.queryParams();
     this.options = _.extend({}, defaults, options, qparams);
@@ -11,21 +12,74 @@ class App {
   }
 
   init() {
+    this.transcriptsLoaded = false;
+
+    // parse templates
+    _.templateSettings = {
+      interpolate: /\{\{(.+?)\}\}/g,
+    };
+    this.searchResultItemTemplate = _.template($('#search-result-list-item-template').html());
+    this.$results = $('#search-results-list');
+    this.$resultsContainer = $('#search-results');
+    this.$resultsMessage = $('#search-message');
+
     const timelineDataURL = `../data/${this.options.project}/timeline.json`;
     const timelineDataPromise = $.getJSON(timelineDataURL, (data) => data);
+
+    const transcriptDataURL = `../data/${this.options.project}/transcripts.json`;
+    const transcriptDataPromise = $.getJSON(transcriptDataURL, (data) => data);
+    this.transcriptDataPromise = $.Deferred();
 
     $.when(timelineDataPromise).done((timelineData) => {
       this.onTimelineDataLoad(timelineData);
     });
+
+    $.when(transcriptDataPromise).done((transcriptData) => {
+      this.onTranscriptDataLoad(transcriptData);
+      this.transcriptDataPromise.resolve();
+    });
   }
 
-  static loadListeners() {
+  filterResults(year, subcollectionIndex) {
+    const [yearStart] = this.timelineRange;
+    const yearIndex = year - yearStart;
+    const subcollection = this.timelineData[subcollectionIndex];
+    const { title } = subcollection;
+    const docIndices = subcollection.years[yearIndex].docs;
+    const count = docIndices.length;
+
+    this.$resultsMessage.html(`Loading <strong>${count}</strong> results from <strong>${year}</strong> within <strong><em>"${title}"</em></strong>`);
+    this.$results.html('');
+    this.$resultsContainer.addClass('active');
+
+    $.when(this.transcriptDataPromise).done(() => {
+      const docs = [];
+      docIndices.forEach((docIndex) => {
+        docs.push(this.documents[docIndex]);
+      });
+      this.$resultsMessage.html(`Showing <strong>${count}</strong> results from <strong>${year}</strong> within <strong><em>"${title}"</em></strong>`);
+      this.renderDocs(docs);
+    });
+  }
+
+  loadListeners() {
     const $timeline = $('.timeline').first();
     const [timeline] = $timeline;
     $timeline.on('wheel', (e) => {
       e.preventDefault();
       const { deltaY } = e.originalEvent;
       timeline.scrollLeft += deltaY * 0.667;
+    });
+
+    $timeline.on('click', 'button.year', (e) => {
+      const $target = $(e.currentTarget);
+      const year = parseInt($target.attr('data-year'), 10);
+      const subcollection = parseInt($target.attr('data-subcollection'), 10);
+      this.filterResults(year, subcollection);
+    });
+
+    $('.close-search-results').on('click', (e) => {
+      this.$resultsContainer.removeClass('active');
     });
   }
 
@@ -37,7 +91,42 @@ class App {
     this.annotations = timelineData.annotations;
 
     this.renderTimelne();
-    this.constructor.loadListeners();
+    this.loadListeners();
+  }
+
+  onTranscriptDataLoad(transcriptData) {
+    this.documents = DataUtil.loadCollectionFromRows(transcriptData, (doc) => {
+      const updatedDoc = doc;
+      updatedDoc.id = doc.index;
+      updatedDoc.itemUrl = `https://www.loc.gov/resource/${doc.ResourceID}/?sp=${doc.ItemAssetIndex}&st=text`;
+      return updatedDoc;
+    });
+    console.log('Transcript data loaded.');
+    this.transcriptsLoaded = true;
+  }
+
+  renderDocs(docs, query = false) {
+    let html = '';
+    const { wordPad } = this.options;
+    docs.forEach((document, i) => {
+      const text = document.Transcription;
+      let matchText = '';
+      if (query !== false) {
+        matchText = StringUtil.getHighlightedText(text, query, wordPad, wordPad);
+      } else {
+        matchText = text.trim().split(' ').slice(0, wordPad * 2).join(' ');
+      }
+      const data = {
+        className: '',
+        id: document.id,
+        matchText,
+        sequence: i + 1,
+        title: document.Item,
+        url: document.itemUrl,
+      };
+      html += this.searchResultItemTemplate(data);
+    });
+    this.$results.html(html);
   }
 
   renderTimelne() {
