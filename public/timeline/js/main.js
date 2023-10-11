@@ -24,8 +24,8 @@ class App {
     const [timeline] = $timeline;
     $timeline.on('wheel', (e) => {
       e.preventDefault();
-      if (e.originalEvent.deltaY > 0) timeline.scrollLeft += 100;
-      else timeline.scrollLeft -= 100;
+      const { deltaY } = e.originalEvent;
+      timeline.scrollLeft += deltaY * 0.667;
     });
   }
 
@@ -90,11 +90,14 @@ class App {
       timelineHTML += '</div>';
     });
 
-    $('.timeline-wrapper').css('width', `${yearCount * 40}px`);
+    const $timeline = $('.timeline').first();
+    const timelineWidth = yearCount * 40;
+    $('.timeline-wrapper').css('width', `${timelineWidth}px`);
     $('.timeline-labels .sub-collections').html(labelsHTML);
     $('.timeline-wrapper .sub-collections').html(timelineHTML);
     $('.timeline-row.years').html(yearsHTML);
     $('.timeline-row.notes').html(notesHTML);
+    $timeline[0].scrollLeft = timelineWidth * 0.5 - $timeline.width() * 0.5;
   }
 }
 

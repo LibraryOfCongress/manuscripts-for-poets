@@ -50,7 +50,7 @@ button path,
   align-items: center;
 }
 .toolbar button,
-.toolbar button + button {
+.toolbar button.button + button.button {
   display: block;
   margin: 6px 0 0;
 }
@@ -67,6 +67,7 @@ button path,
 .timeline-label {
   font-size: 0.8rem;
   margin: 0;
+  font-weight: normal;
 }
 
 .timeline-wrapper {
@@ -111,11 +112,13 @@ button path,
   background: black;
 }
 .timeline-row button.year:hover,
-.timeline-row button.year:active {
+.timeline-row button.year:focus {
   border: 2px solid rgba(255, 255, 255, 0.667);
+  outline: none;
 }
-.timeline-row.years .year {
-  background: rgba(0, 0, 0, 0.6);
+.timeline-row.years {
+  background: var(--bg-base-light);
+  color: var(--text-base-darkest);
   font-size: 0.7rem;
 }
 .timeline-row,
