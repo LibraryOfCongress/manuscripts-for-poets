@@ -144,20 +144,13 @@ class App {
 
   parseTranscriptData(data) {
     this.loadingOn('Transcript data loaded; parsing data...');
-    const { rows, cols, groups } = data;
-    const documents = _.map(rows, (row, i) => {
-      const doc = _.object(cols, row);
-      // parse grouped values
-      _.each(groups, (values, field) => {
-        doc[field] = values[doc[field]];
-      });
-      // add additional values
-      doc.id = i;
-      doc.itemUrl = `https://www.loc.gov/resource/${doc.ResourceID}/?sp=${doc.ItemAssetIndex}&st=text`;
-      return doc;
+    this.documents = DataUtil.loadCollectionFromRows(data, (doc) => {
+      const updatedDoc = doc;
+      updatedDoc.id = doc.index;
+      updatedDoc.itemUrl = `https://www.loc.gov/resource/${doc.ResourceID}/?sp=${doc.ItemAssetIndex}&st=text`;
+      return updatedDoc;
     });
-    this.documents = documents;
-    this.indexTranscriptData(documents);
+    this.indexTranscriptData(this.documents);
   }
 
   renderResults(results, query) {
