@@ -82,7 +82,7 @@ def main(a):
         if lemma["ent"] != "":
             lemma["pos"] = "ENTITY"
         lemma["Index"] = i
-        lemma["sentiment"] = 0
+        lemma["sentiment"] = round(float(lemma["sentiment"]), 2)
         docIndices = lemma["docs"]
         for docIndex in docIndices:
             docLemmasOut.append((i, docIndex))
@@ -96,7 +96,7 @@ def main(a):
     for i, bucket in enumerate(buckets):
         buckets[i]["wordIndex"] = lemmaMap[bucket["_lemmaIndex"]]
 
-    lemmaCols = ["lemma", "pos", "sentiment"]
+    lemmaCols = ["lemma", "pos"]
     lemmaRows, lemmaGroups = unzipList(lemmasOut, lemmaCols, ["pos"])
 
     bucketCols = ["wordIndex", "subcollectionIndex", "year", "count"]
@@ -115,7 +115,16 @@ def main(a):
             "groups": bucketGroups
         },
         "subCollections": containersNames,
-        "partsOfSpeech": partsOfSpeech
+        "partsOfSpeech": [
+            ("ADJ", "Adjective"),
+            ("ADV", "Adverb"),
+            ("ENTITY", "Entity"),
+            ("NOUN", "Noun"),
+            ("PRON", "Pronoun"),
+            ("PROPN", "Proper Noun"),
+            ("VERB", "Verb")
+        ],
+        "timeRange": [startYear, endYear]
     }
 
     print("Writing files to disk...")
