@@ -89,7 +89,8 @@ def main(a):
         lemmasOut.append(lemma)
         printProgress(i+1, lemmaCount)
     print(f"{lemmaCount} lemmas matched for interface")
-    print(f"POS: {unique([l['pos'] for l in lemmas])}")
+    partsOfSpeech = sorted(unique([l['pos'] for l in lemmasOut]))
+    print(f"POS: {partsOfSpeech}")
 
     print('Re-mapping lemma indices...')
     for i, bucket in enumerate(buckets):
@@ -113,7 +114,8 @@ def main(a):
             "rows": flattenList(bucketRows),
             "groups": bucketGroups
         },
-        "subCollections": containersNames
+        "subCollections": containersNames,
+        "partsOfSpeech": partsOfSpeech
     }
 
     print("Writing files to disk...")
