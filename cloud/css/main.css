@@ -134,6 +134,9 @@
   position: absolute;
   bottom: 25%;
 }
+.timeline button.year.selected {
+  background:rgb(141, 33, 33);
+}
 .timeline .year-label {
   position: absolute;
   text-align: center;
