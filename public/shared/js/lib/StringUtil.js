@@ -1,24 +1,27 @@
 class StringUtil {
-  static getHighlightedText(text, textToHighlight, wordsBeforeCount, wordsAfterCount) {
+  static getHighlightedText(text, textToHighlight, wordsBeforeCount = -1, wordsAfterCount = -1) {
     const regex = new RegExp(textToHighlight.split(/\s+/).filter((i) => i?.length).join('|'), 'gi');
     const textNormalized = text.replace(/\s+/g, ' ');
     const result = textNormalized.replace(regex, (match) => `<strong>${match}</strong>`);
     const resultNormalized = result.replaceAll(/<\/strong>\s*<strong>/gi, ' ');
-    const indexStart = resultNormalized.indexOf('<strong>');
-    const indexEnd = resultNormalized.indexOf('</strong>') + '</strong>'.length;
-    const textBefore = resultNormalized.substring(0, indexStart).trim().replaceAll(/<\/?strong>/gi, '');
-    const textAfter = resultNormalized.substring(indexEnd).trim().replaceAll(/<\/?strong>/gi, '');
-    let wordsBefore = textBefore.split(' ');
-    let wordsAfter = textAfter.split(' ');
-    if (wordsBefore.length > wordsBeforeCount) {
-      wordsBefore = wordsBefore.slice(wordsBefore.length - wordsBeforeCount, wordsBefore.length);
+    let highlighted = resultNormalized;
+    if (wordsBeforeCount > 0 || wordsAfterCount > 0) {
+      const indexStart = resultNormalized.indexOf('<strong>');
+      const indexEnd = resultNormalized.indexOf('</strong>') + '</strong>'.length;
+      const textBefore = resultNormalized.substring(0, indexStart).trim().replaceAll(/<\/?strong>/gi, '');
+      const textAfter = resultNormalized.substring(indexEnd).trim().replaceAll(/<\/?strong>/gi, '');
+      let wordsBefore = textBefore.split(' ');
+      let wordsAfter = textAfter.split(' ');
+      if (wordsBefore.length > wordsBeforeCount) {
+        wordsBefore = wordsBefore.slice(wordsBefore.length - wordsBeforeCount, wordsBefore.length);
+      }
+      if (wordsAfter.length > wordsAfterCount) {
+        wordsAfter = wordsAfter.slice(0, wordsAfterCount);
+      }
+      highlighted = `${wordsBefore.join(' ')} `;
+      highlighted += resultNormalized.substring(indexStart, indexEnd);
+      highlighted += ` ${wordsAfter.join(' ')}`;
     }
-    if (wordsAfter.length > wordsAfterCount) {
-      wordsAfter = wordsAfter.slice(0, wordsAfterCount);
-    }
-    let highlighted = `${wordsBefore.join(' ')} `;
-    highlighted += resultNormalized.substring(indexStart, indexEnd);
-    highlighted += ` ${wordsAfter.join(' ')}`;
     return highlighted;
   }
 
