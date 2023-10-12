@@ -88,6 +88,13 @@
   overflow-y: auto;
   padding: 6px;
 }
+.facets label {
+  color: rgba(255, 255, 255, 0.667);
+  letter-spacing: 1px;
+}
+.facets .facet {
+  margin-bottom: 1rem;
+}
 .facets select {
   width: 100%;
   overflow: hidden;
@@ -107,11 +114,36 @@
   overflow: hidden;
   overflow-y: auto;
 }
+.words .word {
+  margin: 0 6px 6px 0;
+}
 .visualization .timeline {
-  flex-basis: 60px;
+  flex-basis: 80px;
   flex-grow: 0;
   flex-shrink: 0;
   box-sizing: border-box;
   border-top: 2px solid rgba(255, 255, 255, 0.333);
   overflow: hidden;
+  position: relative;
+}
+.timeline button.year {
+  box-sizing: border-box;
+  display: block;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  bottom: 25%;
+}
+.timeline .year-label {
+  position: absolute;
+  text-align: center;
+  font-size: 0.8rem;
+  bottom: 2%;
+}
+.timeline .year-label .text {
+  position: absolute;
+  left: 50%;
+  width: 28px;
+  margin-left: -14px;
+  bottom: 0;
 }
