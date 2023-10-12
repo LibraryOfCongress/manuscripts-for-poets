@@ -12,7 +12,10 @@ class App {
   init() {
     this.$main = $('.main-content').first();
     this.$timeline = $('.timeline').first();
+    this.$documentModal = $('#document-browser');
     this.$words = $('.words').first();
+    this.selected = {};
+    this.currentDocumentIndex = 0;
 
     const timelineDataURL = `../data/${this.options.project}/cloud.json`;
     const timelineDataPromise = $.getJSON(timelineDataURL, (data) => data);
@@ -42,6 +45,12 @@ class App {
       else selected[facet.id] = value >= 0 ? facet.values[value] : false;
     });
 
+    selected.year = -1;
+    if ($('.timeline .year.selected').length > 0) {
+      const selectedYear = parseInt($('.timeline .year.selected').attr('data-year'), 10);
+      selected.year = selectedYear;
+    }
+
     let buckets = this.wordBuckets.slice();
 
     // filter out subcollections
@@ -68,6 +77,7 @@ class App {
     //   });
     // }
     this.filteredWords = buckets;
+    this.selected = selected;
   }
 
   loadListeners() {
@@ -85,6 +95,19 @@ class App {
     this.$timeline.on('click', '.year', (e) => {
       const $target = $(e.currentTarget);
       this.onClickYear($target);
+    });
+
+    this.$words.on('click', '.word', (e) => {
+      const $target = $(e.currentTarget);
+      this.showDocumentsWithWord(parseInt($target.attr('data-index'), 10));
+    });
+
+    $('.prev-doc').on('click', (e) => {
+      this.stepDocument(-1);
+    });
+
+    $('.next-doc').on('click', (e) => {
+      this.stepDocument(1);
     });
   }
 
@@ -105,6 +128,7 @@ class App {
     this.wordDocs = _.chunk(data.wordDocs, 2);
     this.timeRange = data.timeRange;
     this.partsOfSpeech = _.object(data.partsOfSpeech);
+    this.subCollections = data.subCollections;
 
     this.facets = [];
     this.facets.push({
@@ -153,6 +177,21 @@ class App {
     });
     console.log('Transcript data loaded.');
     this.transcriptsLoaded = true;
+  }
+
+  renderDocument() {
+    const { currentDocumentIndex, documentsViewing, $documentModal } = this;
+    const $document = $documentModal.find('#document-container');
+    const $title = $documentModal.find('.resource-link');
+    const doc = documentsViewing[currentDocumentIndex];
+    const text = doc.Transcription;
+    const matchText = StringUtil.getHighlightedText(text, this.selectedWord);
+    let html = '';
+    html += `<div class="pane transcript"><p>${matchText}</p></div>`;
+    html += `<div class="pane image" style="background-image: url(${doc.DownloadUrl})"></div>`;
+    $document.html(html);
+    $title.text(doc.Item);
+    $title.attr('href', doc.itemUrl);
   }
 
   renderFacets() {
@@ -205,13 +244,12 @@ class App {
   }
 
   renderWords() {
-    const { words, $words } = this;
+    const { words, $words, selected } = this;
     let { filteredWords } = this;
 
     // check for year selected
-    if ($('.timeline .year.selected').length > 0) {
-      const selectedYear = parseInt($('.timeline .year.selected').attr('data-year'), 10);
-      filteredWords = filteredWords.filter((w) => w.year === selectedYear);
+    if (selected.year >= 0) {
+      filteredWords = filteredWords.filter((w) => w.year === selected.year);
     }
 
     const dataGroups = _.groupBy(filteredWords, 'wordIndex');
@@ -235,6 +273,41 @@ class App {
       html += `<button class="word" data-index="${wordData.wordIndex}" style="font-size: ${fontSize}rem">${word.lemma}</button>`;
     });
     $words.html(html);
+  }
+
+  showDocumentsWithWord(wordIndex) {
+    this.$documentModal.addClass('active');
+
+    const { selected } = this;
+    const word = this.words[wordIndex];
+    const wordDocsFiltered = this.wordDocs.filter((wordDoc) => wordDoc[0] === wordIndex);
+    const docIndices = wordDocsFiltered.map((wd) => wd[1]);
+    this.documentsViewing = [];
+    this.selectedWord = word.lemma;
+
+    $.when(this.transcriptDataPromise).done(() => {
+      let docs = docIndices.map((docIndex) => this.documents[docIndex]);
+      if (selected.year >= 0) {
+        docs = docs.filter((d) => d.EstimatedYear === selected.year);
+      }
+      if (selected.subCollection >= 0) {
+        const subCollection = this.subCollections[selected.subCollection];
+        docs = docs.filter((b) => b.Project === subCollection);
+      }
+      this.currentDocumentIndex = 0;
+      this.documentsViewing = docs;
+      this.renderDocument();
+    });
+  }
+
+  stepDocument(amount) {
+    if (this.documentsViewing.length <= 0) return;
+    this.currentDocumentIndex += amount;
+    if (this.currentDocumentIndex >= this.documentsViewing.length) this.currentDocumentIndex = 0;
+    else if (this.currentDocumentIndex < 0) {
+      this.currentDocumentIndex = this.documentsViewing.length - 1;
+    }
+    this.renderDocument();
   }
 }
 

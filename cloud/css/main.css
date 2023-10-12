@@ -150,3 +150,77 @@
   margin-left: -14px;
   bottom: 0;
 }
+
+.modal {
+  position: absolute;
+  z-index: 999;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  box-sizing: border-box;
+  border: 2px solid rgb(83, 59, 30);
+  background: rgb(39, 27, 12);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  display: none;
+}
+.modal.active {
+  display: flex;
+}
+.modal .document {
+  flex-grow: 1;
+  box-sizing: border-box;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.333);
+  display: flex;
+  overflow: hidden;
+}
+.modal .document .pane {
+  flex-basis: 50%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  overflow: hidden;
+}
+.modal .document .image {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.modal .document .transcript {
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+.modal .document .transcript strong {
+  color: black;
+  background-color: rgb(255, 200, 59);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+.modal .buttons {
+  flex-basis: 60px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal .resource-link {
+  margin: 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modal .close {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
