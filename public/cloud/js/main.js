@@ -42,14 +42,8 @@ class App {
       else selected[facet.id] = value >= 0 ? facet.values[value] : false;
     });
 
-    selected.year = -1;
-    if ($('.timeline .year.selected').length > 0) {
-      selected.year = parseInt($('.timeline .year.selected').attr('data-year'), 10);
-    }
-
     let buckets = this.wordBuckets.slice();
-    // filter out years
-    if (selected.year >= 0) buckets = buckets.filter((b) => b.year === selected.year);
+
     // filter out subcollections
     if (selected.subCollection >= 0) {
       buckets = buckets.filter((b) => b.subcollectionIndex === selected.subCollection);
@@ -73,7 +67,7 @@ class App {
     //     return sentiment >= minValue && sentiment <= maxValue;
     //   });
     // }
-    this.filteredWords = _.sortBy(buckets, (b) => -b.count);
+    this.filteredWords = buckets;
   }
 
   loadListeners() {
@@ -88,10 +82,10 @@ class App {
       this.renderWords();
     });
 
-    // this.$timeline.on('click', '.year', (e) => {
-    //   const $target = $(e.currentTarget);
-    //   this.onClickYear($target);
-    // });
+    this.$timeline.on('click', '.year', (e) => {
+      const $target = $(e.currentTarget);
+      this.onClickYear($target);
+    });
   }
 
   onClickYear($target) {
@@ -100,13 +94,11 @@ class App {
       $('.year').removeClass('selected');
       $target.addClass('selected');
     }
-    this.filterData();
-    this.renderTimeline();
     this.renderWords();
   }
 
   onCloudDataLoad(data) {
-    console.log('Coud data loaded.');
+    console.log('Cloud data loaded.');
 
     this.words = DataUtil.loadCollectionFromRows(data.words, false, true);
     this.wordBuckets = DataUtil.loadCollectionFromRows(data.wordBuckets, false, true);
@@ -213,7 +205,14 @@ class App {
 
   renderWords() {
     const { words, $words } = this;
-    const { filteredWords } = this;
+    let { filteredWords } = this;
+
+    // check for year selected
+    if ($('.timeline .year.selected').length > 0) {
+      const selectedYear = parseInt($('.timeline .year.selected').attr('data-year'), 10);
+      filteredWords = filteredWords.filter((w) => w.year === selectedYear);
+    }
+
     const dataGroups = _.groupBy(filteredWords, 'wordIndex');
     let wordGroups = _.map(dataGroups, (group, wordIndex) => {
       const word = { wordIndex };
