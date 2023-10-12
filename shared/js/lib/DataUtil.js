@@ -1,6 +1,10 @@
 class DataUtil {
-  static loadCollectionFromRows(data, customMap = false) {
-    const { rows, cols, groups } = data;
+  static loadCollectionFromRows(data, customMap = false, isFlattened = false) {
+    let { rows } = data;
+    const { cols, groups } = data;
+    if (isFlattened) {
+      rows = _.chunk(rows, cols.length);
+    }
     const documents = _.map(rows, (row, i) => {
       let doc = _.object(cols, row);
       // parse grouped values

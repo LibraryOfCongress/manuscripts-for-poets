@@ -1,0 +1,117 @@
+.loc-header {
+  border-bottom: 3px solid var(--bg-base-lightest);
+}
+
+.main-content {
+  background-color: rgb(102, 71, 32);
+  color: var(--text-base-lightest);
+  position: relative;
+  padding: 0;
+}
+
+.main-content button {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.main-content button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.main-content a,
+.main-content a:visited {
+  color:rgb(252, 183, 98);
+}
+.main-content a:hover {
+  color:rgb(254, 218, 173);
+}
+
+.app {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: calc(100vh - 100px);
+}
+.intro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(39, 27, 12);
+  padding: 40px;
+  box-sizing: border-box;
+  font-size: 2rem;
+  text-align: center;
+}
+.intro p {
+  margin: 0 0 0.8rem;
+  max-width: 1000px;
+}
+.intro button {
+  padding: 0.4rem 0.8rem;
+}
+.intro .loading {
+  display: none;
+}
+.intro .loaded {
+  display: block;
+}
+.is-loading .intro .loading {
+  display: block;
+}
+.is-loading .intro .loaded {
+  display: none;
+}
+.app,
+.intro {
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.intro.active,
+.app.active {
+  opacity: 1;
+  z-index: 10;
+}
+
+.facets {
+  flex-basis: 200px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.333);
+  border-right: 2px solid rgba(255, 255, 255, 0.333);
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 6px;
+}
+.facets select {
+  width: 100%;
+  overflow: hidden;
+}
+
+.visualization {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+.visualization .words {
+  flex-grow: 1;
+  padding: 6px;
+  background-color: rgba(0, 0, 0, 0.667);
+  overflow: hidden;
+  overflow-y: auto;
+}
+.visualization .timeline {
+  flex-basis: 60px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-top: 2px solid rgba(255, 255, 255, 0.333);
+  overflow: hidden;
+}
