@@ -109,6 +109,10 @@ class App {
     $('.next-doc').on('click', (e) => {
       this.stepDocument(1);
     });
+
+    $('.close-modal').on('click', (e) => {
+      $(e.currentTarget).closest('.modal').removeClass('active');
+    });
   }
 
   onClickYear($target) {
@@ -117,6 +121,7 @@ class App {
       $('.year').removeClass('selected');
       $target.addClass('selected');
     }
+    this.filterData();
     this.renderWords();
   }
 
