@@ -125,7 +125,7 @@ class App {
       const updatedDoc = doc;
       updatedDoc.id = doc.index;
       updatedDoc.itemUrl = `https://www.loc.gov/resource/${doc.ResourceID}/?sp=${doc.ItemAssetIndex}&st=text`;
-      updatedDoc.DownloadUrl = `http://tile.loc.gov/image-services/iiif/${doc.DownloadUrl}/full/pct:100/0/default.jpg`;
+      updatedDoc.DownloadUrl = `https://tile.loc.gov/image-services/iiif/${doc.DownloadUrl}/full/pct:100/0/default.jpg`;
       return updatedDoc;
     });
     this.indexTranscriptData(this.documents);
