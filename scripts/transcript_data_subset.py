@@ -13,7 +13,7 @@ def parseArgs():
 
     # pylint: disable=line-too-long
     parser = argparse.ArgumentParser()
-    parser.add_argument("-in", dest="TRANSCRIPT", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_correspondence.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
+    parser.add_argument("-in", dest="TRANSCRIPT", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
     parser.add_argument("-filter", dest="FILTER", default="", help="Filter query string; leave blank if no filter")
     parser.add_argument("-include", dest="INCLUDE_FIELDS", default="", help="Fields to include; leave blank if all")
     parser.add_argument("-exclude", dest="EXCLUDE_FIELDS", default="", help="Fields to exclude; leave blank if none")
