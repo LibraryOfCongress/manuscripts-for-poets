@@ -11,4 +11,4 @@ requests
 
 # For natural language processing
 spacy
-spacy-language-detection
+spacy_fastlang
