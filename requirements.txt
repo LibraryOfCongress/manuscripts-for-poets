@@ -12,3 +12,6 @@ requests
 # For natural language processing
 spacy
 spacy_fastlang
+
+# For printing pretty tables
+tabulate
