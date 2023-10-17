@@ -15,27 +15,44 @@ def parseArgs():
     # pylint: disable=line-too-long
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates_selection.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
-    parser.add_argument("-filter", dest="FILTER", default="", help="Filter query string; leave blank if no filter")
+    parser.add_argument("-filter", dest="FILTER", default="lang=en", help="Filter query string; leave blank if no filter")
     parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_prompts.csv", help="Output csv file")
     parser.add_argument("-debug", dest="DEBUG", action="store_true", help="Debug?")
     args = parser.parse_args()
     return args
 
 def isImperative(span):
+    """Check if a span of text is imperative"""
     value = False
     for token in span:
         if token.pos_ == "VERB":
-            # exclude past tense verbs
-            tense = token.morph.get("Tense")
-            if tense == "Past" or "Past" in tense:
-                break
-            value = True
+            # only include infinitive form of verbs
+            verbForm = token.morph.get("VerbForm")
+            if verbForm == "Inf" or "Inf" in verbForm:
+                value = True
             break
         elif token.pos_ not in ("ADV", "CCONJ", "AUX", "PART"):
             break
     return value
 
-def getSentences(nlp, transcript, minTokens=3, maxTokens=100):
+def getWords(sent):
+    """Retrieve a list of non-stop words from sentence"""
+    words = []
+    for token in sent:
+        # skip stop words unless beginning of entity
+        if token.is_stop and token.ent_iob_ != 'B':
+            continue
+        # skip non-alphanum unless beginning of entity
+        if token.pos_ in ['PUNCT', 'SPACE', 'CCONJ', 'X', 'SYM', 'NUM'] and token.ent_iob_ != 'B':
+            continue
+        # skip ambiguous words unless beginning of entity
+        if '?' in token.shape_ and token.ent_iob_ != 'B':
+            continue
+        words.append(token)
+    return words
+
+def getSentences(nlp, transcript, minWords=3, maxWords=60):
+    """Retrieve a list of sentences from a text"""
     doc = nlp(transcript)
     types=["imperative"]
     sents = list(doc.sents)
@@ -44,7 +61,9 @@ def getSentences(nlp, transcript, minTokens=3, maxTokens=100):
         text = sent.as_doc().text.replace('\n', ' ').replace('\r', '').replace('  ', ' ')
 
         tokenCount = len(sent)
-        if tokenCount < minTokens or tokenCount > maxTokens:
+        words = getWords(sent)
+        wordCount = len(words)
+        if wordCount < minWords or wordCount > maxWords:
             continue
 
         # split sentence into clauses
