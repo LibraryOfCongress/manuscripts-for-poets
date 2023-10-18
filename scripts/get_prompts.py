@@ -28,7 +28,7 @@ def getFirstValue(arr):
         value = arr[0]
     return value
 
-def isImperative(span):
+def isImperative(nlp, span):
     """Check if a span of text is imperative"""
     value = None
     for i, token in enumerate(span):
@@ -42,14 +42,20 @@ def isImperative(span):
             if person not in ("None", "1", "2"):
                 value = False
                 break
-        if token.pos_ == "VERB":
+        verbForm = getFirstValue(token.morph.get("VerbForm"))
+        if token.pos_ == "VERB" or verbForm != "None":
             # only include infinitive form of verbs
-            verbForm = getFirstValue(token.morph.get("VerbForm"))
-            if verbForm == "Inf":
-                value = True
-                break
             tense = getFirstValue(token.morph.get("Tense"))
             mood = getFirstValue(token.morph.get("Mood"))
+            if verbForm == "Inf":
+                # Put "You" in front on verb and see if it is in present tense
+                testText = f"You {token.text.lower()}"
+                testDoc = nlp(testText)
+                testToken = testDoc[1]
+                testTense = getFirstValue(testToken.morph.get("Tense"))
+                if testTense in ("Pres"):
+                    value = True
+                break
             # or if verb is in Present tense and is Finite, or if mood is Imperative
             if (tense in ("Pres") and verbForm in ("Fin")) or mood in ("Imp"):
                 value = True
@@ -121,7 +127,7 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
         # Retrieve sentence type and filter
         sentenceType = "unknown"
         for j, clause in enumerate(clauses):
-            isImperativeValue = isImperative(clause)
+            isImperativeValue = isImperative(nlp, clause)
             if isImperativeValue is True:
                 sentenceType = "imperative"
                 break
@@ -137,6 +143,15 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
                 hasEntities = True
                 break
         if hasEntities:
+            continue
+
+        # skip sentences with numbers
+        hasNumbers = False
+        for token in sent:
+            if token.pos_ == "NUM":
+                hasNumbers = True
+                break
+        if hasNumbers:
             continue
 
         # skip sentences with question marks within the sentence
