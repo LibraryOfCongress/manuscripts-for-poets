@@ -1,0 +1,218 @@
+.loc-header {
+  border-bottom: 3px solid var(--bg-base-lightest);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+body {
+  background: black;
+}
+.main-content {
+  background-color: rgba(102, 71, 32, 1);
+  color: var(--text-base-lightest);
+  position: relative;
+  padding: 0;
+  transition: background-color 2s ease-in-out;
+}
+
+.main-content button {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.main-content button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.main-content a,
+.main-content a:visited {
+  color:rgb(252, 183, 98);
+}
+.main-content a:hover {
+  color:rgb(254, 218, 173);
+}
+
+.app {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: calc(100vh - 100px);
+  flex-direction: column;
+}
+.intro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(39, 27, 12);
+  padding: 40px;
+  box-sizing: border-box;
+  font-size: 2rem;
+  text-align: center;
+}
+.intro p {
+  margin: 0 0 0.8rem;
+  max-width: 1000px;
+}
+.intro button {
+  padding: 0.4rem 0.8rem;
+}
+.intro .loading {
+  display: none;
+}
+.intro .loaded {
+  display: block;
+}
+.is-loading .intro .loading {
+  display: block;
+}
+.is-loading .intro .loaded {
+  display: none;
+}
+.app,
+.intro {
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.intro.active,
+.app.active {
+  opacity: 1;
+  z-index: 10;
+}
+
+.prompt {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: stretch;
+}
+.prompt-buttons {
+  flex-basis: 120px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.prompt-buttons button {
+  margin: 6px 0;
+  padding: 0;
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.prompt-buttons button path {
+  fill: rgba(255, 255, 255, 0.667);
+}
+.prompt-content {
+  flex-grow: 1;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.prompt-text p {
+  margin: 0;
+  font-size: 5vmin;
+  font-family: monospace;
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out;
+  animation-fill-mode: both;
+}
+.meta {
+  box-sizing: border-box;
+  padding: 20px;
+}
+.meta h2,
+.meta h3 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.modal {
+  position: absolute;
+  z-index: 999;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  box-sizing: border-box;
+  border: 2px solid rgb(83, 59, 30);
+  background: rgb(39, 27, 12);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  display: none;
+}
+.modal.active {
+  display: flex;
+}
+.modal .document {
+  flex-grow: 1;
+  box-sizing: border-box;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.333);
+  display: flex;
+  overflow: hidden;
+}
+.modal .document .pane {
+  flex-basis: 50%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  overflow: hidden;
+}
+.modal .document .image {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.modal .document .transcript {
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+.modal .document .transcript strong {
+  color: black;
+  background-color: rgb(255, 200, 59);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+.modal .buttons {
+  flex-basis: 60px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal .resource-link {
+  margin: 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modal .close-modal {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
