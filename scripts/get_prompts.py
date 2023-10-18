@@ -4,6 +4,7 @@
 
 import argparse
 from pprint import pprint
+import re
 import spacy
 
 from utilities import *
@@ -14,23 +15,48 @@ def parseArgs():
 
     # pylint: disable=line-too-long
     parser = argparse.ArgumentParser()
-    parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates_selection.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
-    parser.add_argument("-filter", dest="FILTER", default="lang=en", help="Filter query string; leave blank if no filter")
+    parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
+    parser.add_argument("-filter", dest="FILTER", default="lang=en AND Project IN LIST Letters between friends, allies, and others|Family letters|Speeches and writings|Diaries and journals: 1888-1951", help="Filter query string; leave blank if no filter")
     parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_prompts.csv", help="Output csv file")
     parser.add_argument("-debug", dest="DEBUG", action="store_true", help="Debug?")
     args = parser.parse_args()
     return args
 
+def getFirstValue(arr):
+    value = "None"
+    if len(arr) > 0:
+        value = arr[0]
+    return value
+
 def isImperative(span):
     """Check if a span of text is imperative"""
-    value = False
-    for token in span:
+    value = None
+    for i, token in enumerate(span):
+        # Exclude if starts with noun
+        if i == 0 and token.pos_ in ("NOUN"):
+            value = False
+            break
+        # Only allow to start with 1st or 2nd person prounouns (I, you)
+        if i == 0 and token.pos_ in ("PRON"):
+            person = getFirstValue(token.morph.get("Person"))
+            if person not in ("None", "1", "2"):
+                value = False
+                break
         if token.pos_ == "VERB":
             # only include infinitive form of verbs
-            verbForm = token.morph.get("VerbForm")
-            if verbForm == "Inf" or "Inf" in verbForm:
+            verbForm = getFirstValue(token.morph.get("VerbForm"))
+            if verbForm == "Inf":
                 value = True
+                break
+            tense = getFirstValue(token.morph.get("Tense"))
+            mood = getFirstValue(token.morph.get("Mood"))
+            # or if verb is in Present tense and is Finite, or if mood is Imperative
+            if (tense in ("Pres") and verbForm in ("Fin")) or mood in ("Imp"):
+                value = True
+            else:
+                value = False
             break
+        # Adverbs, etc are allowed up until we hit a verb
         elif token.pos_ not in ("ADV", "CCONJ", "AUX", "PART"):
             break
     return value
@@ -51,6 +77,13 @@ def getWords(sent):
         words.append(token)
     return words
 
+def normalizeText(text):
+    """Normalize a block of text"""
+    text = ' '.join(text.split()) # replace all whitespace with single space
+    text = re.sub(r"^[^a-zA-Z0-9]+", "", text) # remove non-alpha from beginning of string
+    text = re.sub(r"[^a-zA-Z0-9\.!?]+$", "", text) # remove non-alpha and punct from end of string
+    return text
+
 def getSentences(nlp, transcript, minWords=3, maxWords=60):
     """Retrieve a list of sentences from a text"""
     doc = nlp(transcript)
@@ -58,8 +91,12 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
     sents = list(doc.sents)
     validSents = []
     for sent in sents:
-        text = sent.as_doc().text.replace('\n', ' ').replace('\r', '').replace('  ', ' ')
+        text = normalizeText(sent.text)
+        # skip sentences that start with lowercase
+        if text[0].islower():
+            continue
 
+        # skip sentences with too little or too many words
         tokenCount = len(sent)
         words = getWords(sent)
         wordCount = len(words)
@@ -71,7 +108,7 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
         clauseStart = 0
         clauseEnd = 0
         for j, token in enumerate(sent):
-            if token.shape_ == "," and token.pos_ == "PUNCT":
+            if token.shape_ in (",", ";") and token.pos_ == "PUNCT":
                 if clauseEnd > clauseStart:
                     clauses.append(sent[clauseStart:clauseEnd])
                 clauseStart = j + 1
@@ -83,9 +120,12 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
 
         # Retrieve sentence type and filter
         sentenceType = "unknown"
-        for clause in clauses:
-            if isImperative(clause):
+        for j, clause in enumerate(clauses):
+            isImperativeValue = isImperative(clause)
+            if isImperativeValue is True:
                 sentenceType = "imperative"
+                break
+            elif isImperativeValue is False and j == 0:
                 break
         if types is not False and sentenceType not in types:
             continue
@@ -127,11 +167,12 @@ def main(a):
     makeDirectories(a.OUTPUT_FILE)
 
     fieldnames, rows = readCsv(a.INPUT_FILE)
-    rowCount = len(rows)
 
     # Filter data if necessary
     if len(a.FILTER) > 0:
         rows = filterByQueryString(rows, a.FILTER)
+
+    rowCount = len(rows)
 
     nlp = spacy.load("en_core_web_lg")
 
@@ -150,6 +191,8 @@ def main(a):
             # print("----------------------------------")
             rowSentences[j]["doc"] = row["Index"]
             rowSentences[j]["ResourceURL"] = row["ResourceURL"]
+            rowSentences[j]["Project"] = row["Project"]
+            rowSentences[j]["EstimatedYear"] = row["EstimatedYear"]
         sentences += rowSentences
         printProgress(i+1, rowCount, "Progress: ")
 
@@ -157,7 +200,7 @@ def main(a):
         return
 
     # Write data to file
-    fieldnamesOut = ["text", "type", "doc", "ResourceURL"]
+    fieldnamesOut = ["text", "type", "doc", "ResourceURL", "Project", "EstimatedYear"]
     writeCsv(a.OUTPUT_FILE, sentences, fieldnamesOut)
 
 main(parseArgs())
