@@ -92,8 +92,8 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
     validSents = []
     for sent in sents:
         text = normalizeText(sent.text)
-        # skip sentences that start with lowercase
-        if text[0].islower():
+        # skip sentences that are empty or start with lowercase
+        if len(text) <= 0 or text[0].islower():
             continue
 
         # skip sentences with too little or too many words
