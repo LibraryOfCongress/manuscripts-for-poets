@@ -22,6 +22,12 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+def checkVerb(nlp, token):
+    testText = f"You {token.text.lower()}"
+    testDoc = nlp(testText)
+    testToken = testDoc[1]
+    return testToken
+
 def getFirstValue(arr):
     value = "None"
     if len(arr) > 0:
@@ -32,33 +38,39 @@ def isImperative(nlp, span):
     """Check if a span of text is imperative"""
     value = None
     for i, token in enumerate(span):
+        person = getFirstValue(token.morph.get("Person"))
+        verbForm = getFirstValue(token.morph.get("VerbForm"))
         # Exclude if starts with noun
-        if i == 0 and token.pos_ in ("NOUN"):
+        if i == 0 and token.pos_ == "NOUN":
             value = False
             break
         # Only allow to start with 1st or 2nd person prounouns (I, you)
-        if i == 0 and token.pos_ in ("PRON"):
-            person = getFirstValue(token.morph.get("Person"))
+        if i == 0 and token.pos_ == "PRON":
             if person not in ("None", "1", "2"):
                 value = False
                 break
-        verbForm = getFirstValue(token.morph.get("VerbForm"))
+        
         if token.pos_ == "VERB" or verbForm != "None":
             # only include infinitive form of verbs
             tense = getFirstValue(token.morph.get("Tense"))
             mood = getFirstValue(token.morph.get("Mood"))
             if verbForm == "Inf":
-                # Put "You" in front on verb and see if it is in present tense
-                testText = f"You {token.text.lower()}"
-                testDoc = nlp(testText)
-                testToken = testDoc[1]
+                # Put "You" in front on verb and double check if it is in present tense
+                testToken = checkVerb(nlp, token)
                 testTense = getFirstValue(testToken.morph.get("Tense"))
-                if testTense in ("Pres"):
+                if testTense == "Pres":
                     value = True
-                break
+                else:
+                    value = False
             # or if verb is in Present tense and is Finite, or if mood is Imperative
-            if (tense in ("Pres") and verbForm in ("Fin")) or mood in ("Imp"):
-                value = True
+            elif (tense == "Pres" and verbForm == "Fin" and person != "1") or mood == "Imp":
+                # Put "You" in front on verb and double check if it is in present tense
+                testToken = checkVerb(nlp, token)
+                testTense = getFirstValue(testToken.morph.get("Tense"))
+                if testTense == "Pres":
+                    value = True
+                else:
+                    value = False
             else:
                 value = False
             break

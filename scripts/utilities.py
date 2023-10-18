@@ -4,8 +4,10 @@ import csv
 import dateparser
 import datetime
 import glob
+import itertools
 import json
 import math
+from operator import itemgetter
 import os
 import re
 import shutil
@@ -127,6 +129,15 @@ def filterByQueryString(arr, queryString, verbose=True):
             print(f"{len(filteredArr)} items after filter query '{queryStringItem}'")
     return filteredArr
 
+def findInList(arr, key, value):
+    """Find the first entry in a list with a specific value"""
+    match = None
+    for item in arr:
+        if key in item and item[key] == value:
+            match = item
+            break
+    return match
+
 def flattenList(arr):
     """Flattens a list of lists"""
     return [item for sublist in arr for item in sublist]
@@ -184,6 +195,24 @@ def getFilenames(fileString, verbose=False):
     if verbose:
         print(f"Found {fileCount} files")
     return files
+
+def groupList(arr, groupBy, sort=False, desc=True):
+    """Group a list by value"""
+    groups = []
+    arr = sorted(arr, key=itemgetter(groupBy))
+    for key, items in itertools.groupby(arr, key=itemgetter(groupBy)):
+        group = {}
+        litems = list(items)
+        count = len(litems)
+        group["groupKey"] = groupBy
+        group[groupBy] = key
+        group["items"] = litems
+        group["count"] = count
+        groups.append(group)
+    if sort:
+        isReversed = desc
+        groups = sorted(groups, key=lambda k: k["count"], reverse=isReversed)
+    return groups
 
 def lerp(ab, amount):
     """Interpolate between two values"""
