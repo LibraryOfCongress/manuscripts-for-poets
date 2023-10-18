@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>By The People manuscript collection prompt interface</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <link rel="stylesheet" href="../shared/css/vendor/normalize.css">
+  <link rel="stylesheet" href="../shared/css/app.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+
+  <!-- LoC banner starts here -->
+  <header class="loc-header">
+      <div class="loc-logo">
+          <a href="https://www.loc.gov/"><img src="../shared/img/LOC_Logo_horiz_inv.png" alt="The Library of Congress logo" title="Go to the Library of Congress homepage" /></a>
+      </div>
+      <div class="project-description">
+          <p>This is a project explores new ways of engaging with <a href="https://www.loc.gov/item/2021387726/">the transcript data</a> of the <a href="https://www.loc.gov/collections/mary-church-terrell-papers/about-this-collection/">Mary Church Terrell Papers</a> at the <a href="https://www.loc.gov/">Library of Congress</a>. <a href="about.html" class="button small">Learn more</a> <a href="https://github.com/libraryOfCongress/loc-transcript-lab" class="button small">View the code</a></p>
+      </div>
+  </header>
+  <!-- /LoC banner end here -->
+
+  <!-- Your code starts here -->
+  <main id="main-content" class="main-content is-loading">
+    <div class="app">
+        <div class="prompt">
+            <div class="prompt-buttons">
+                <button class="save-prompt">
+                    <svg class="icon add-icon" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                    </svg>
+                </button>
+                <button class="next-prompt">
+                    <svg class="icon refresh-icon" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.87 5.87 0 0 1 6 12c0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="prompt-content"><div id="prompt-text" class="prompt-text"></div></div>
+        </div>
+        <div id="meta" class="meta"></div>
+    </div>
+    <div id="document-browser" class="modal">
+        <div id="document-container" class="document"></div>
+        <div class="buttons">
+            <a href="#" target="_blank" class="resource-link">Loading...</a>
+        </div>
+        <button class="close-modal"><span class="visually-hidden">Close</span>×</button>
+    </div>
+    <div class="intro active">
+        <p>The <a href="https://www.loc.gov/collections/mary-church-terrell-papers/about-this-collection/">Mary Church Terrell Papers</a> at the <a href="https://www.loc.gov/">Library of Congress</a> consist of approximately 13,000 documents, comprising 25,323 images, all of which were digitized and <a href="https://www.loc.gov/item/2021387726/">transcribed</a> by <a href="https://crowd.loc.gov/campaigns/mary-church-terrell-advocate-for-african-americans-and-women/"></a>volunteers</a> participating in the Library's <a href="https://crowd.loc.gov/">By The People</a> program.</p>
+        
+        <p>&lt;Project intro goes here.&gt;</p>
+
+        <div class="loading">
+            <p><button disabled>Loading transcript data...</button></p>
+        </div>
+        <div class="loaded">
+            <p><button class="start">Start</button></p>
+        </div>
+    </div>
+  </main>
+  <!-- /Your code end here -->
+
+  <!-- LoC footer starts here -->
+  <footer class="loc-footer">
+      <p>This is a project explores new ways of engaging with <a href="https://www.loc.gov/item/2021387726/">the transcript data</a> of the <a href="https://www.loc.gov/collections/mary-church-terrell-papers/about-this-collection/">Mary Church Terrell Papers</a> at the <a href="https://www.loc.gov/">Library of Congress</a></p>
+      <ul class="loc-footer-nav-list" role="navigation">
+          <li><a href="https://github.com/libraryOfCongress/loc-transcript-lab">Source code</a></li>  
+          <li><a href="https://www.loc.gov/">The Library of Congress</a></li>
+          <li><a href="https://loc.gov/legal">Privacy Policy</a>.</li>
+          <li><a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement">Github Privacy Statement</a>.</li>
+          <li><a href="https://creativecommons.org/publicdomain/zero/1.0/">License</a></li>
+          <li><a href="mailto:ccdi@loc.gov">Contact</a></li>
+      </ul>
+  </footer>
+  <!-- /LoC footer end here -->
+
+  <script src="../shared/js/vendor/jquery-3.7.0.min.js"></script>  
+  <script src="../shared/js/vendor/underscore-umd-1.13.6.min.js"></script>
+
+  <script src="../shared/js/lib/DataUtil.js"></script>
+  <script src="../shared/js/lib/MathUtil.js"></script>
+  <script src="../shared/js/lib/StringUtil.js"></script>
+
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
