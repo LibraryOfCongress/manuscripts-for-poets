@@ -102,7 +102,7 @@ def normalizeText(text):
     text = re.sub(r"[^a-zA-Z0-9\.!?]+$", "", text) # remove non-alpha and punct from end of string
     return text
 
-def getSentences(nlp, transcript, minWords=3, maxWords=60):
+def getSentences(nlp, transcript, minWords=3, maxWords=36):
     """Retrieve a list of sentences from a text"""
     doc = nlp(transcript)
     types=["imperative"]
@@ -143,7 +143,11 @@ def getSentences(nlp, transcript, minWords=3, maxWords=60):
             if isImperativeValue is True:
                 sentenceType = "imperative"
                 break
+            # False value only applies to first clause
             elif isImperativeValue is False and j == 0:
+                break
+            # only check the first two clauses for imperative
+            elif j >= 1:
                 break
         if types is not False and sentenceType not in types:
             continue
