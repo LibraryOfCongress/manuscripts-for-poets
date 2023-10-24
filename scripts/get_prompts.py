@@ -16,19 +16,21 @@ def parseArgs():
     # pylint: disable=line-too-long
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
-    parser.add_argument("-filter", dest="FILTER", default="lang=en AND Project IN LIST Letters between friends, allies, and others|Family letters|Speeches and writings|Diaries and journals: 1888-1951", help="Filter query string; leave blank if no filter")
+    parser.add_argument("-filter", dest="FILTER", default="lang=en AND Project IN LIST Family letters|Speeches and writings|Diaries and journals: 1888-1951", help="Filter query string; leave blank if no filter")
     parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_prompts.csv", help="Output csv file")
     parser.add_argument("-debug", dest="DEBUG", action="store_true", help="Debug?")
     args = parser.parse_args()
     return args
 
 def checkVerb(nlp, token):
+    """Test a verb by placing a You in front of it"""
     testText = f"You {token.text.lower()}"
     testDoc = nlp(testText)
     testToken = testDoc[1]
     return testToken
 
 def getFirstValue(arr):
+    """Get the first value of an array"""
     value = "None"
     if len(arr) > 0:
         value = arr[0]
@@ -40,20 +42,24 @@ def isImperative(nlp, span):
     for i, token in enumerate(span):
         person = getFirstValue(token.morph.get("Person"))
         verbForm = getFirstValue(token.morph.get("VerbForm"))
-        # Exclude if starts with noun
-        if i == 0 and token.pos_ == "NOUN":
+        verbType = getFirstValue(token.morph.get("VerbType"))
+        tense = getFirstValue(token.morph.get("Tense"))
+        mood = getFirstValue(token.morph.get("Mood"))
+
+        # Exclude if starts with noun or particle unless it is imperative
+        if i == 0 and token.pos_ in ("NOUN", "PART") and mood != "Imp":
             value = False
             break
+
         # Only allow to start with 1st or 2nd person prounouns (I, you)
         if i == 0 and token.pos_ == "PRON":
             if person not in ("None", "1", "2"):
                 value = False
                 break
         
-        if token.pos_ == "VERB" or verbForm != "None":
+        # We hit a verb or verb-like word
+        if token.pos_ == "VERB" or verbForm != "None" or verbType != "None":
             # only include infinitive form of verbs
-            tense = getFirstValue(token.morph.get("Tense"))
-            mood = getFirstValue(token.morph.get("Mood"))
             if verbForm == "Inf":
                 # Put "You" in front on verb and double check if it is in present tense
                 testToken = checkVerb(nlp, token)
@@ -62,15 +68,16 @@ def isImperative(nlp, span):
                     value = True
                 else:
                     value = False
-            # or if verb is in Present tense and is Finite, or if mood is Imperative
-            elif (tense == "Pres" and verbForm == "Fin" and person != "1") or mood == "Imp":
-                # Put "You" in front on verb and double check if it is in present tense
-                testToken = checkVerb(nlp, token)
-                testTense = getFirstValue(testToken.morph.get("Tense"))
-                if testTense == "Pres":
-                    value = True
-                else:
-                    value = False
+            # # or if verb is in Present tense and is Finite, or if mood is Imperative
+            # elif (tense == "Pres" and verbForm == "Fin" and person not in ("1", "3")) or mood == "Imp":
+            #     # Put "You" in front on verb and double check if it is in present tense
+            #     testToken = checkVerb(nlp, token)
+            #     testTense = getFirstValue(testToken.morph.get("Tense"))
+            #     if testTense == "Pres":
+            #         print(f"{normalizeText(span.text)} -- {token.pos_} -- {token.morph}")
+            #         value = True
+            #     else:
+            #         value = False
             else:
                 value = False
             break
@@ -79,20 +86,15 @@ def isImperative(nlp, span):
             break
     return value
 
+def isQuestion(nlp, span):
+    value = None
+
+    return value
+
 def getWords(sent):
-    """Retrieve a list of non-stop words from sentence"""
-    words = []
-    for token in sent:
-        # skip stop words unless beginning of entity
-        if token.is_stop and token.ent_iob_ != 'B':
-            continue
-        # skip non-alphanum unless beginning of entity
-        if token.pos_ in ['PUNCT', 'SPACE', 'CCONJ', 'X', 'SYM', 'NUM'] and token.ent_iob_ != 'B':
-            continue
-        # skip ambiguous words unless beginning of entity
-        if '?' in token.shape_ and token.ent_iob_ != 'B':
-            continue
-        words.append(token)
+    """Retrieve a list of words from sentence"""
+    nonwords = ['PUNCT', 'SPACE', 'X', 'SYM', 'NUM']
+    words = [token for token in sent if token.pos_ not in nonwords]
     return words
 
 def normalizeText(text):
@@ -102,7 +104,7 @@ def normalizeText(text):
     text = re.sub(r"[^a-zA-Z0-9\.!?]+$", "", text) # remove non-alpha and punct from end of string
     return text
 
-def getSentences(nlp, transcript, minWords=3, maxWords=36):
+def getSentences(nlp, transcript, minWords=3, maxWords=24):
     """Retrieve a list of sentences from a text"""
     doc = nlp(transcript)
     types=["imperative"]
