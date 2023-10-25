@@ -87,7 +87,21 @@ def isImperative(nlp, span):
     return value
 
 def isQuestion(nlp, span):
+    """Check if a span of text is a question"""
     value = None
+
+    # Check to see if it ends in a question
+    if len(span) > 0:
+        lastToken = span[-1]
+        if lastToken.text != "?" or lastToken.pos_ != "PUNCT":
+            value = False
+
+        if value is None:
+            firstToken = span[0]
+            verbForm = getFirstValue(firstToken.morph.get("VerbForm"))
+            pos = firstToken.pos_
+            if pos == "PRON" or verbForm != "None":
+                value = True
 
     return value
 
@@ -107,7 +121,8 @@ def normalizeText(text):
 def getSentences(nlp, transcript, minWords=3, maxWords=24):
     """Retrieve a list of sentences from a text"""
     doc = nlp(transcript)
-    types=["imperative"]
+    types=["imperative", "interrogative"]
+    # types=["interrogative"]
     sents = list(doc.sents)
     validSents = []
     for sent in sents:
@@ -151,6 +166,11 @@ def getSentences(nlp, transcript, minWords=3, maxWords=24):
             # only check the first two clauses for imperative
             elif j >= 1:
                 break
+
+        if sentenceType == "unknown":
+            if isQuestion(nlp, sent) is True:
+                sentenceType = "interrogative"
+
         if types is not False and sentenceType not in types:
             continue
 
