@@ -17,7 +17,7 @@ def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
     parser.add_argument("-filter", dest="FILTER", default="lang=en AND Project IN LIST Family letters|Speeches and writings|Diaries and journals: 1888-1951", help="Filter query string; leave blank if no filter")
-    parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_prompts.csv", help="Output csv file")
+    parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20.csv", help="Output csv file")
     parser.add_argument("-debug", dest="DEBUG", action="store_true", help="Debug?")
     args = parser.parse_args()
     return args
@@ -82,7 +82,7 @@ def isImperative(nlp, span):
                 value = False
             break
         # Adverbs, etc are allowed up until we hit a verb
-        elif token.pos_ not in ("ADV", "CCONJ", "AUX", "PART"):
+        elif token.pos_ not in ("ADV", "CCONJ", "AUX", "PART", "SPACE"):
             break
     return value
 
@@ -91,24 +91,42 @@ def isQuestion(nlp, span):
     value = None
 
     # Check to see if it ends in a question
-    if len(span) > 0:
+    if len(span) > 1:
         lastToken = span[-1]
         if lastToken.text != "?" or lastToken.pos_ != "PUNCT":
             value = False
 
-        if value is None:
-            firstToken = span[0]
-            verbForm = getFirstValue(firstToken.morph.get("VerbForm"))
-            pos = firstToken.pos_
-            if pos == "PRON" or verbForm != "None":
-                value = True
+        else:
+            for token in span:
+                verbForm = getFirstValue(token.morph.get("VerbForm"))
+                pos = token.pos_
+
+                # Starts with pronoun (who, what)
+                    # Or subordinating conjunction (if, why)
+                    # Or has a verb form (do, will)
+                if pos in ("PRON", "SCONJ") or verbForm != "None":
+                    value = True
+                    break
+
+                # It can also start with a coordinating conjunction (and, or, but) and spaces
+                elif pos in ("SPACE", "CCONJ"):
+                    continue
+                
+                # Otherwise, it's false
+                else:
+                    value = False
+                    break
 
     return value
 
+def isWord(token):
+    """Check if token is a word"""
+    nonwords = ['PUNCT', 'SPACE', 'X', 'SYM', 'NUM']
+    return token.pos_ not in nonwords
+
 def getWords(sent):
     """Retrieve a list of words from sentence"""
-    nonwords = ['PUNCT', 'SPACE', 'X', 'SYM', 'NUM']
-    words = [token for token in sent if token.pos_ not in nonwords]
+    words = [token for token in sent if isWord(token)]
     return words
 
 def normalizeText(text):
@@ -192,10 +210,10 @@ def getSentences(nlp, transcript, minWords=3, maxWords=24):
         if hasNumbers:
             continue
 
-        # skip sentences with question marks within the sentence
+        # skip sentences with question marks or unknown words within the sentence
         hasAmbiguous = False
         for j, token in enumerate(sent):
-            if token.shape_ == "?" and j < (tokenCount-1):
+            if (token.shape_ == "?" and j < (tokenCount-1)) or token.pos_ == "X":
                 hasAmbiguous = True
                 break
         if hasAmbiguous:
