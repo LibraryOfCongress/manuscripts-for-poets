@@ -11,7 +11,9 @@
     },
     "rules": {
       "no-console": "off",
+      "no-param-reassign": "off",
       "no-undef": "off",
-      "no-unused-vars": "off"
+      "no-unused-vars": "off",
+      "space-unary-ops": "off"
     }
 }
