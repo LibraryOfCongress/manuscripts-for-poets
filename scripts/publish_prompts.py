@@ -48,7 +48,7 @@ def main(a):
         docIndex = int(prompt["doc"])
         prompts[i]["doc"] = docIndex
         pdoc = docs[docIndex]
-        for field in ["ItemAssetIndex", "ResourceID"]:
+        for field in ["ItemAssetIndex", "ResourceID", "Item"]:
             prompts[i][field] = pdoc[field]
 
     # Retrieve matched docs
@@ -75,8 +75,8 @@ def main(a):
     print(f"{len(containersNames)} containers: {containersNames}")
 
     # Write prompts
-    promptCols = ["text", "type", "doc", "Project", "EstimatedYear", "ItemAssetIndex", "ResourceID"]
-    promptGroups = ["type", "Project", "ResourceID"]
+    promptCols = ["text", "type", "doc", "Project", "EstimatedYear", "ItemAssetIndex", "ResourceID", "Item"]
+    promptGroups = ["type", "Project", "ResourceID", "Item"]
     promptRows, promptGroups = unzipList(prompts, promptCols, promptGroups)
     jsonOut = {
         "prompts": {

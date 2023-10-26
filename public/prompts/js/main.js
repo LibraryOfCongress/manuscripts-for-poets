@@ -110,9 +110,8 @@ class App {
     this.$prompt.html(`<p>${prompt.text}</p>`);
 
     let html = '';
-    const year = prompt.EstimatedYear.length > 0 ? prompt.EstimatedYear : 'undated';
     html += '<h2>Mary Church Terrell Papers</h2>';
-    html += `<h3>${prompt.Project} (${year}) <button class="show-doc">View in context</button></h3>`;
+    html += `<h3>${prompt.Item} <button class="show-doc">View in context</button></h3>`;
     this.$meta.html(html);
     const variance = 5;
     const r = Math.round(MathUtil.lerp(102 - variance, 102 + variance, Math.random()));
