@@ -21,15 +21,36 @@ class App {
 
     const transcriptDataURL = `../data/${this.options.project}/prompts-docs.json`;
     const transcriptDataPromise = $.getJSON(transcriptDataURL, (data) => data);
-    this.transcriptDataPromise = $.Deferred();
+    const imagePromise = $.Deferred();
 
-    $.when(promptDataPromise).done((data) => {
-      this.onPromptDataLoad(data);
+    // wait to load collage images
+    const imagePromises = [];
+    $('.collage-image').each((index, imgEl) => {
+      const promise = new Promise((resolve, reject) => {
+        const src = imgEl.getAttribute('src');
+        const img = new Image();
+        img.src = src;
+        if (img.completed) {
+          // console.log('Loaded image');
+          resolve(imgEl);
+        } else {
+          img.onload = () => {
+            // console.log('Loaded image');
+            resolve(imgEl);
+          };
+        }
+      });
+      imagePromises.push(promise);
+    });
+    Promise.all(imagePromises).then((images) => {
+      console.log('Loaded all images');
+      imagePromise.resolve(images);
     });
 
-    $.when(transcriptDataPromise).done((data) => {
-      this.onTranscriptDataLoad(data.docs);
-      this.transcriptDataPromise.resolve();
+    $.when(promptDataPromise, transcriptDataPromise, imagePromise).done((pdata, tdata, idata) => {
+      this.constructor.onImageLoad(idata);
+      this.onTranscriptDataLoad(tdata[0].docs);
+      this.onPromptDataLoad(pdata[0]);
     });
   }
 
@@ -48,7 +69,18 @@ class App {
     });
 
     this.$meta.on('click', '.show-doc', (e) => {
-      this.renderDocument();
+      this.showDocument();
+    });
+  }
+
+  static onImageLoad(images) {
+    images.forEach((image) => {
+      const $image = $(image);
+      const x = parseFloat($image.attr('data-x'));
+      const y = parseFloat($image.attr('data-y'));
+      $image.css({
+        opacity: 1,
+      });
     });
   }
 
@@ -73,6 +105,8 @@ class App {
   }
 
   onTranscriptDataLoad(transcriptData) {
+    console.log('Transcript data loaded.');
+
     this.documents = DataUtil.loadCollectionFromRows(transcriptData, (doc) => {
       const updatedDoc = doc;
       updatedDoc.id = doc.index;
@@ -100,7 +134,6 @@ class App {
     $document.html(html);
     $title.text(doc.Item);
     $title.attr('href', doc.itemUrl);
-    $documentModal.addClass('active');
   }
 
   renderNextPrompt() {
@@ -119,6 +152,12 @@ class App {
     const b = Math.round(MathUtil.lerp(32 - variance, 32 + variance, Math.random()));
     const alpha = MathUtil.lerp(0.25, 1, Math.random());
     this.$main.css('background-color', `rgba(${r}, ${g}, ${b}, ${alpha})`);
+
+    this.renderDocument();
+  }
+
+  showDocument() {
+    this.$documentModal.addClass('active');
   }
 }
 
