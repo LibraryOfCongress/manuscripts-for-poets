@@ -103,12 +103,37 @@ class App {
       }, delayDuration);
     });
 
+    const $window = $(window);
+    let windowW = $window.width();
+    let windowH = $window.height();
+    $window.on('resize', (e) => {
+      windowW = $window.width();
+      windowH = $window.height();
+    });
+
     setTimeout(() => {
       $container.css('opacity', '0.075');
       this.$intro.addClass('active');
+      $('.collage-image').css('transition', 'none');
+      // move the images when the mouse moves
+      this.$main.on('mousemove', (e) => {
+        const { clientX, clientY } = e;
+        let nx = MathUtil.clamp(clientX / windowW);
+        let ny = MathUtil.clamp(clientY / windowH);
+        nx = MathUtil.lerp(1, -1, nx);
+        ny = MathUtil.lerp(1, -1, ny);
+        imageData.forEach((im) => {
+          const { $image, x, y } = im;
+          const imx = MathUtil.lerp(-1, 1, x);
+          const imy = MathUtil.lerp(-1, 1, y);
+          const dx = imx * nx;
+          const dy = imy * ny;
+          const deltaX = dx * 50;
+          const deltaY = dy * 50;
+          $image.css('transform', `translate3d(${deltaX}px, ${deltaY}px, 0)`);
+        });
+      });
     }, 3000);
-
-    this.imageData = imageData;
   }
 
   onPromptDataLoad(data) {
@@ -132,8 +157,6 @@ class App {
   }
 
   onTranscriptDataLoad(transcriptData) {
-    console.log('Transcript data loaded.');
-
     this.documents = DataUtil.loadCollectionFromRows(transcriptData, (doc) => {
       const updatedDoc = doc;
       updatedDoc.id = doc.index;
@@ -179,7 +202,6 @@ class App {
     // const b = Math.round(MathUtil.lerp(32 - variance, 32 + variance, Math.random()));
     // const alpha = MathUtil.lerp(0.25, 1, Math.random());
     // this.$main.css('background-color', `rgba(${r}, ${g}, ${b}, ${alpha})`);
-
     this.renderDocument();
   }
 
