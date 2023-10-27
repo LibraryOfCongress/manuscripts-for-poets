@@ -104,7 +104,7 @@ class App {
     });
 
     setTimeout(() => {
-      $container.css('opacity', '0.1');
+      $container.css('opacity', '0.075');
       this.$intro.addClass('active');
     }, 3000);
 
