@@ -11,7 +11,7 @@ body {
   background: black;
 }
 .main-content {
-  background-color: rgb(66, 49, 27);
+  background-color: rgb(40, 31, 18);
   color: var(--text-base-lightest);
   position: relative;
   padding: 0;
@@ -51,18 +51,25 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   padding: 40px;
   box-sizing: border-box;
-  text-align: center;
   opacity: 0;
+}
+.intro h1 {
+  letter-spacing: 2px;
+}
+.intro h1 .names {
+  color: rgb(161, 120, 70);
 }
 .intro p {
   margin: 0 0 0.8rem;
-  max-width: 1000px;
+  width: 80%;
+  max-width: 640px;
+  letter-spacing: 1px;
 }
 .intro button {
-  padding: 0.4rem 0.8rem;
+  padding: 0.6rem 1rem;
+  font-size: 1.4rem;
 }
 .intro .loading {
   display: none;
@@ -95,14 +102,17 @@ body {
   width: 284.36vh;
   left: 50%;
   margin-left: -142.18vh;
+  transition: opacity 2s ease-in-out;
+  opacity: 1;
 }
 .collage-image {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 0;
+  bottom: 0;
   left: 0;
-  transition: opacity 1s ease-in-out;
+  opacity: 0;
+  transform-origin: center center;
 }
 
 .prompt {
