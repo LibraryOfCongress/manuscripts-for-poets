@@ -12,6 +12,7 @@ class App {
     this.currentPromptIndex = -1;
 
     this.$main = $('#main-content');
+    this.$intro = $('#intro');
     this.$prompt = $('#prompt-text');
     this.$meta = $('#meta');
     this.$documentModal = $('#document-browser');
@@ -30,12 +31,9 @@ class App {
         const src = imgEl.getAttribute('src');
         const img = new Image();
         img.src = src;
-        if (img.completed) {
-          // console.log('Loaded image');
-          resolve(imgEl);
-        } else {
+        if (img.completed) resolve(imgEl);
+        else {
           img.onload = () => {
-            // console.log('Loaded image');
             resolve(imgEl);
           };
         }
@@ -44,11 +42,11 @@ class App {
     });
     Promise.all(imagePromises).then((images) => {
       console.log('Loaded all images');
+      this.onImageLoad(images);
       imagePromise.resolve(images);
     });
 
     $.when(promptDataPromise, transcriptDataPromise, imagePromise).done((pdata, tdata, idata) => {
-      this.constructor.onImageLoad(idata);
       this.onTranscriptDataLoad(tdata[0].docs);
       this.onPromptDataLoad(pdata[0]);
     });
@@ -73,15 +71,44 @@ class App {
     });
   }
 
-  static onImageLoad(images) {
-    images.forEach((image) => {
+  onImageLoad(images) {
+    const $container = $('#collage');
+    const containerW = $container.width();
+    const containerH = $container.height();
+    const imageData = images.map((image, i) => ({ i, image }));
+    images.forEach((image, i) => {
       const $image = $(image);
+      imageData[i].$image = $image;
       const x = parseFloat($image.attr('data-x'));
       const y = parseFloat($image.attr('data-y'));
+      imageData[i].x = x;
+      imageData[i].y = y;
+      // move images toward the center to start
+      const deltaX = (0.5 - x) * containerW;
+      let deltaY = containerH;
+      if (y < 0.5) deltaY = -containerH;
       $image.css({
-        opacity: 1,
+        transform: `translate3d(${deltaX}px, ${deltaY}px, 0)`,
       });
+      // animate the images back to the original position
+      const transitionDuration = MathUtil.lerp(0.5, 2, Math.random());
+      const delayN = (0.5 - Math.abs(0.5 - x)) * 2; // delay longer for images in center
+      const delayDuration = parseInt(MathUtil.lerp(100, 1000, delayN), 10);
+      setTimeout(() => {
+        $image.css({
+          opacity: 1,
+          transition: `opacity ${transitionDuration}s ease-in-out, transform ${transitionDuration}s ease-in-out`,
+          transform: 'translate3d(0, 0, 0)',
+        });
+      }, delayDuration);
     });
+
+    setTimeout(() => {
+      $container.css('opacity', '0.1');
+      this.$intro.addClass('active');
+    }, 3000);
+
+    this.imageData = imageData;
   }
 
   onPromptDataLoad(data) {
@@ -146,12 +173,12 @@ class App {
     html += '<h2>Mary Church Terrell Papers</h2>';
     html += `<h3>${prompt.Item} <button class="show-doc">View in context</button></h3>`;
     this.$meta.html(html);
-    const variance = 5;
-    const r = Math.round(MathUtil.lerp(102 - variance, 102 + variance, Math.random()));
-    const g = Math.round(MathUtil.lerp(71 - variance, 71 + variance, Math.random()));
-    const b = Math.round(MathUtil.lerp(32 - variance, 32 + variance, Math.random()));
-    const alpha = MathUtil.lerp(0.25, 1, Math.random());
-    this.$main.css('background-color', `rgba(${r}, ${g}, ${b}, ${alpha})`);
+    // const variance = 5;
+    // const r = Math.round(MathUtil.lerp(102 - variance, 102 + variance, Math.random()));
+    // const g = Math.round(MathUtil.lerp(71 - variance, 71 + variance, Math.random()));
+    // const b = Math.round(MathUtil.lerp(32 - variance, 32 + variance, Math.random()));
+    // const alpha = MathUtil.lerp(0.25, 1, Math.random());
+    // this.$main.css('background-color', `rgba(${r}, ${g}, ${b}, ${alpha})`);
 
     this.renderDocument();
   }
