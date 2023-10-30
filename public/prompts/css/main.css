@@ -113,8 +113,8 @@ body {
   left: 0;
   opacity: 0;
   transform-origin: center center;
-  -webkit-backface-visibility: hidden;
-  -webkit-transform-style: preserve-3d;
+  /* -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d; */
 }
 
 .prompt {
