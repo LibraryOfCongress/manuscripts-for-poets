@@ -124,7 +124,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
-  width: 300px;
+  width: 280px;
   height: auto;
   cursor: pointer;
   margin: 16px 12px 0 0;
@@ -221,7 +221,8 @@ li.dropdown-list-container {
 }
 .prompt-controls {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: center;
   box-sizing: border-box;
   padding: 12px;
   position: relative;
@@ -229,7 +230,6 @@ li.dropdown-list-container {
 }
 .prompt-options {
   display: flex;
-  flex-grow: 1;
 }
 .prompt-option {
   border: 0;
@@ -265,6 +265,11 @@ li.dropdown-list-container {
   background-color: rgba(0,94,162,.1);
   border-color: #005ea2;
 }
+button.next-prompt {
+  font-size: 1.4rem;
+  padding: 6px 12px;
+}
+
 .prompt-content {
   flex-grow: 1;
   max-width: 1000px;
@@ -284,6 +289,8 @@ li.dropdown-list-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
+  padding: 12px;
 }
 .prompt-text p {
   margin: 0;
@@ -292,6 +299,7 @@ li.dropdown-list-container {
   opacity: 0;
   animation: fadeIn 2s ease-in-out;
   animation-fill-mode: both;
+  max-width: 800px;
 }
 .meta {
   box-sizing: border-box;
