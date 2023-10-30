@@ -117,6 +117,101 @@ body {
   -webkit-transform-style: preserve-3d; */
 }
 
+.dropdown {
+  list-style: none;
+  position: relative;
+  background:rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  width: 300px;
+  height: auto;
+  cursor: pointer;
+  margin: 16px 12px 0 0;
+  padding: 0;
+}
+.dropdown-label {
+  position: absolute;
+  top: -25px;
+  left: 0px;
+}
+.dropdown-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transition: transform 0.2s linear;
+  margin-top: -2px;
+}
+.dropdown-arrow path {
+  fill: white;
+}
+.dropdown-arrow.expanded {
+  transform: rotate(-180deg);
+}
+.dropdown-list {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  background:rgba(255, 255, 255, 0.15);
+  transition: opacity 0.1s cubic-bezier(0, 0, 0.38, 0.9), max-height 0.5s cubic-bezier(0, 0, 0.38, 0.9);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: none;
+  box-sizing: border-box;
+}
+.dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dropdown li {
+  padding: 6px;
+  cursor: pointer;
+}
+.dropdown li:hover,
+.dropdown li:focus {
+  background: rgba(255, 255, 255, 0.1);
+}
+.dropdown li.dropdown-label {
+  cursor: default;
+  padding: 0;
+}
+.dropdown li.dropdown-label:hover,
+.dropdown li.dropdown-label:focus {
+  background: none;
+}
+li.dropdown-list-container {
+  position: relative;
+  padding: 0;
+}
+.dropdown-list-item {
+  transition: background-color 0.1s linear, color 0.1s linear;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+.dropdown-list-item:first-child {
+  border-top: none;
+}
+.dropdown li:focus {
+  outline: 1px solid #ffdb3d;
+}
+.dropdown.open .dropdown-list {
+  opacity: 1;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+.option-title {
+  font-weight: bold;
+}
+.option-description {
+  font-size: 0.8em;
+}
+
 .prompt {
   display: flex;
   flex-grow: 1;
@@ -124,28 +219,51 @@ body {
   align-items: stretch;
   position: relative;
 }
-.prompt-buttons {
-  flex-basis: 120px;
-  flex-grow: 0;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.prompt-buttons button {
-  margin: 6px 0;
-  padding: 0;
-  text-align: center;
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
+.prompt-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  box-sizing: border-box;
+  padding: 12px;
+  position: relative;
+  z-index: 1000;
 }
-.prompt-buttons button path {
-  fill: rgba(255, 255, 255, 0.667);
+.prompt-options {
+  display: flex;
+  flex-grow: 1;
+}
+.prompt-option {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.radio-option {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 20%;
+  box-sizing: border-box;
+  padding: 6px 6px 6px 0;
+}
+.radio-group {
+  display: flex;
+}
+.radio-input {
+  position: absolute;
+  left: -999em;
+  right: auto;
+}
+.radio-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.radio-label .label-description {
+  font-size: 0.9em;
+  display: block;
+  font-weight: normal;
+  margin-top: 3px;
+}
+.radio-input:checked + .radio-label {
+  background-color: rgba(0,94,162,.1);
+  border-color: #005ea2;
 }
 .prompt-content {
   flex-grow: 1;
