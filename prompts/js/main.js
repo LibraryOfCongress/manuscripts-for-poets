@@ -88,7 +88,7 @@ class App {
       let deltaY = containerH;
       if (y < 0.5) deltaY = -containerH;
       $image.css({
-        transform: `translate3d(${deltaX}px, ${deltaY}px, 0)`,
+        transform: `translate(${deltaX}px, ${deltaY}px)`,
       });
       // animate the images back to the original position
       const transitionDuration = MathUtil.lerp(0.5, 2, Math.random());
@@ -98,7 +98,7 @@ class App {
         $image.css({
           opacity: 1,
           transition: `opacity ${transitionDuration}s ease-in-out, transform ${transitionDuration}s ease-in-out`,
-          transform: 'translate3d(0, 0, 0)',
+          transform: 'translate(0, 0)',
         });
       }, delayDuration);
     });
@@ -130,7 +130,7 @@ class App {
           const dy = imy * ny;
           const deltaX = dx * 50;
           const deltaY = dy * 50;
-          $image.css('transform', `translate3d(${deltaX}px, ${deltaY}px, 0)`);
+          $image.css('transform', `translate(${deltaX}px, ${deltaY}px)`);
         });
       });
     }, 3000);
