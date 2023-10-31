@@ -299,6 +299,16 @@ def readJSON(filename):
                 data = {}
     return data
 
+def readText(filename, lines=False):
+    """Function to read a text file"""
+    contents = ""
+    if os.path.isfile(filename):
+        with open(filename, "r", encoding="utf8", errors="replace") as f:
+            contents = f.read()
+    if lines:
+        contents = [line.strip() for line in contents.splitlines()]
+    return contents
+
 def removeDir(path):
     """Function for removing a directory given path string."""
     if os.path.isdir(path):

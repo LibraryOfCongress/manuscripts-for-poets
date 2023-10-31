@@ -13,6 +13,8 @@ def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file that has been run through: add_resource_data_to_transcript_data.py and parse_dates.py and resolve_dates.py")
     parser.add_argument("-prompts", dest="PROMPT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_prompts.csv", help="A prompt .csv file generated via get_prompts.py")
+    parser.add_argument("-starred", dest="STARRED_PROMPTS", default="data/mary-church-terrell-starred-prompts.txt", help="A list of prompts that should be starred")
+    parser.add_argument("-stop", dest="STOP_TEXTS", default="nigge", help="A list of text that should be excluded")
     parser.add_argument("-out", dest="OUTPUT_FILE", default="public/data/mary-church-terrell/prompts.json", help="Output JSON file")
     args = parser.parse_args()
     return args
@@ -26,6 +28,9 @@ def main(a):
     # Read data from .csv file
     dFields, docs = readCsv(a.INPUT_FILE)
     pFields, prompts = readCsv(a.PROMPT_FILE)
+    starred = readText(a.STARRED_PROMPTS, True)
+    stops = [t.strip().lower() for t in a.STOP_TEXTS.split(",")]
+    stops = [t for t in stops if len(t) > 0]
 
     # Parse docs
     for i, doc in enumerate(docs):
@@ -37,19 +42,40 @@ def main(a):
         docs[i]["DownloadUrl"] = url
     docs = sorted(docs, key=lambda k: k["Index"])
 
+    # Remove prompts with stop text
+    if len(stops) > 0:
+        validPrompts = []
+        for p in prompts:
+            text = p["text"].lower()
+            valid = True
+            for stop in stops:
+                if stop in text:
+                    valid = False
+                    break
+            if valid:
+                validPrompts.append(p)
+        prompts = validPrompts
+        print(f"{len(prompts)} prompts after filtering stop words")
+
     # Remove duplicate prompts
     promptGroups = groupList(prompts, "text")
     prompts = []
     for group in promptGroups:
         prompts.append(group["items"][0])
+    print(f"{len(prompts)} prompts after removing duplicates")
 
     # Add metadata to prompts
     for i, prompt in enumerate(prompts):
+        # add doc metadata
         docIndex = int(prompt["doc"])
         prompts[i]["doc"] = docIndex
         pdoc = docs[docIndex]
         for field in ["ItemAssetIndex", "ResourceID", "Item"]:
             prompts[i][field] = pdoc[field]
+        # add starred tag
+        prompts[i]["tag"] = ""
+        if prompt["text"] in starred:
+            prompts[i]["tag"] = "starred"
 
     # Retrieve matched docs
     docIndices = unique([p["doc"] for p in prompts])
@@ -75,8 +101,8 @@ def main(a):
     print(f"{len(containersNames)} containers: {containersNames}")
 
     # Write prompts
-    promptCols = ["text", "type", "doc", "Project", "EstimatedYear", "ItemAssetIndex", "ResourceID", "Item"]
-    promptGroups = ["type", "Project", "ResourceID", "Item"]
+    promptCols = ["text", "type", "doc", "Project", "EstimatedYear", "ItemAssetIndex", "ResourceID", "Item", "tag"]
+    promptGroups = ["type", "Project", "ResourceID", "Item", "tag"]
     promptRows, promptGroups = unzipList(prompts, promptCols, promptGroups)
     jsonOut = {
         "prompts": {
