@@ -70,6 +70,7 @@ class App {
       });
       return isVisible;
     });
+
     // hack: if not enough prompts, remove the year filter
     if (filteredPrompts.length <= 3) {
       console.log('Not enough prompts for this filter combination. Removing date filter.');
@@ -77,7 +78,20 @@ class App {
       this.onFilter($button);
       return;
     }
+
+    // randomize prompts
     this.filteredPrompts = _.shuffle(filteredPrompts);
+
+    // prioritize starred prompts
+    const prioritizeStarred = 3;
+    let starred = this.filteredPrompts.filter((p) => p.tag === 'starred');
+    if (starred.length > prioritizeStarred) starred = starred.slice(0, prioritizeStarred);
+    if (starred.length > 0) {
+      const starredTexts = _.pluck(starred, 'text');
+      const unstarred = this.filteredPrompts.filter((p) => starredTexts.indexOf(p.text) < 0);
+      this.filteredPrompts = starred.concat(unstarred);
+    }
+
     this.currentPromptIndex = -1;
   }
 
