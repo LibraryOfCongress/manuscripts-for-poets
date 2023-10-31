@@ -46,6 +46,7 @@ class App {
       imagePromise.resolve(images);
     });
 
+    this.loadFilters();
     $.when(promptDataPromise, transcriptDataPromise, imagePromise).done((pdata, tdata, idata) => {
       this.onTranscriptDataLoad(tdata[0].docs);
       this.onPromptDataLoad(pdata[0]);
@@ -53,7 +54,31 @@ class App {
   }
 
   filterPrompts() {
-    const { prompts } = this;
+    const { prompts, dataFilters } = this;
+
+    const filteredPrompts = prompts.filter((prompt) => {
+      let isVisible = true;
+      _.each(dataFilters, (dataFilter, key) => {
+        const { currentValue } = dataFilter;
+        const pvalue = prompt[key];
+        if (currentValue !== 'any') {
+          if (Array.isArray(currentValue)) {
+            const [start, end] = currentValue;
+            if (pvalue !== '' && (pvalue < start || pvalue >= end)) isVisible = false;
+          } else if (pvalue !== currentValue) isVisible = false;
+        }
+      });
+      return isVisible;
+    });
+    // hack: if not enough prompts, remove the year filter
+    if (filteredPrompts.length <= 3) {
+      console.log('Not enough prompts for this filter combination. Removing date filter.');
+      const $button = $('#time-period-any');
+      this.onFilter($button);
+      return;
+    }
+    this.filteredPrompts = _.shuffle(filteredPrompts);
+    this.currentPromptIndex = -1;
   }
 
   loadListeners() {
@@ -75,12 +100,45 @@ class App {
     });
 
     $('.dropdown-list-item').on('click', (e) => {
-      this.selectOption($(e.currentTarget));
+      this.onFilter($(e.currentTarget));
     });
 
     this.$meta.on('click', '.show-doc', (e) => {
       this.showDocument();
     });
+  }
+
+  loadFilters() {
+    const dataFilters = {};
+    $('.data-option').each((i, el) => {
+      const name = el.getAttribute('data-name');
+      let value = el.getAttribute('data-value');
+      if (name === 'EstimatedYear' && value.includes('-')) {
+        value = value.split('-', 2).map((v) => parseInt(v, 10));
+      }
+      if (_.has(dataFilters, name)) {
+        dataFilters[name].values.push(value);
+      } else {
+        dataFilters[name] = { values: [value], currentValue: 'any' };
+      }
+    });
+    this.dataFilters = dataFilters;
+  }
+
+  onFilter($selectButton) {
+    const $dropdown = $selectButton.closest('.dropdown');
+    const $selected = $dropdown.find('.dropdown-selected');
+    const name = $selectButton.attr('data-name');
+    const value = $selectButton.attr('data-value');
+    $dropdown.find('.dropdown-list-item').attr('aria-selected', 'false');
+    $selectButton.attr('aria-selected', 'true');
+    $selected.text($selectButton.find('.option-title').text());
+    $selected.attr('aria-expanded', 'false');
+    $dropdown.find('.dropdown-list')[0].hidden = true;
+    if (name === 'EstimatedYear' && value.includes('-')) {
+      this.dataFilters[name].currentValue = value.split('-', 2).map((v) => parseInt(v, 10));
+    } else this.dataFilters[name].currentValue = value;
+    this.filterPrompts();
   }
 
   onImageLoad(images) {
@@ -153,14 +211,15 @@ class App {
 
     this.prompts = DataUtil.loadCollectionFromRows(data.prompts, (prompt) => {
       const updatedPrompt = prompt;
-      updatedPrompt.Project = prompt.Project.replace(/:.+/i, '');
+      // updatedPrompt.Project = prompt.Project.replace(/:.+/i, '');
       updatedPrompt.itemUrl = `https://www.loc.gov/resource/${prompt.ResourceID}/?sp=${prompt.ItemAssetIndex}&st=text`;
       return updatedPrompt;
     }, true);
-    this.prompts = _.shuffle(this.prompts);
-    this.promptCount = this.prompts.length;
+    this.filterPrompts();
     this.timeRange = data.timeRange;
     this.subCollections = data.subCollections;
+
+    // this.printBuckets();
 
     this.promptDataLoaded = true;
     this.$main.removeClass('is-loading');
@@ -178,6 +237,40 @@ class App {
     }, true);
     console.log('Transcript data loaded.');
     this.transcriptsLoaded = true;
+  }
+
+  printBuckets() {
+    const { dataFilters, prompts } = this;
+    const buckets = [];
+    const promptFilter = (prompt, key, value) => {
+      if (Array.isArray(value)) {
+        return prompt[key] === '' || (prompt[key] >= value[0] && prompt[key] < value[1]);
+      }
+      return prompt[key] === value;
+    };
+    let level = 0;
+    _.each(dataFilters, (dataFilter, key) => {
+      const entries = dataFilter.values;
+      level += 1;
+      entries.forEach((value) => {
+        const bucketKey = (typeof value === 'string') ? value : value.toString();
+        if (level === 1) {
+          const matches = _.filter(prompts, (prompt) => promptFilter(prompt, key, value));
+          buckets.push({ bname: bucketKey, bprompts: matches, blevel: level });
+        } else {
+          buckets.forEach(({ bname, bprompts, blevel }) => {
+            if (blevel === (level - 1)) {
+              const newKey = `${bname}-${bucketKey}`;
+              const newPrompts = _.filter(bprompts, (prompt) => promptFilter(prompt, key, value));
+              buckets.push({ bname: newKey, bprompts: newPrompts, blevel: level });
+            }
+          });
+        }
+      });
+    });
+
+    const printBuckets = buckets.filter((bucket) => bucket.blevel === level);
+    console.log(printBuckets);
   }
 
   renderDocument() {
@@ -200,8 +293,8 @@ class App {
 
   renderNextPrompt() {
     this.currentPromptIndex += 1;
-    if (this.currentPromptIndex >= this.promptCount) this.currentPromptIndex = 0;
-    const prompt = this.prompts[this.currentPromptIndex];
+    if (this.currentPromptIndex >= this.filteredPrompts.length) this.currentPromptIndex = 0;
+    const prompt = this.filteredPrompts[this.currentPromptIndex];
     this.$prompt.html(`<p>${prompt.text}</p>`);
 
     let html = '';
@@ -215,17 +308,6 @@ class App {
     // const alpha = MathUtil.lerp(0.25, 1, Math.random());
     // this.$main.css('background-color', `rgba(${r}, ${g}, ${b}, ${alpha})`);
     this.renderDocument();
-  }
-
-  selectOption($selectButton) {
-    const $dropdown = $selectButton.closest('.dropdown');
-    const $selected = $dropdown.find('.dropdown-selected');
-    $dropdown.find('.dropdown-list-item').attr('aria-selected', 'false');
-    $selectButton.attr('aria-selected', 'true');
-    $selected.text($selectButton.find('.option-title').text());
-    $selected.attr('aria-expanded', 'false');
-    $dropdown.find('.dropdown-list')[0].hidden = true;
-    this.filterPrompts();
   }
 
   showDocument() {
