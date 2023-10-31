@@ -239,6 +239,11 @@ class App {
     this.transcriptsLoaded = true;
   }
 
+  static preloadImage(url) {
+    const img = new Image();
+    img.src = url;
+  }
+
   printBuckets() {
     const { dataFilters, prompts } = this;
     const buckets = [];
@@ -289,6 +294,7 @@ class App {
     $document.html(html);
     $title.text(doc.Item);
     $title.attr('href', doc.itemUrl);
+    this.constructor.preloadImage(doc.DownloadUrl);
   }
 
   renderNextPrompt() {
