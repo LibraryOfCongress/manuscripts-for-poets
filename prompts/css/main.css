@@ -118,16 +118,13 @@ body {
 }
 
 .dropdown {
-  list-style: none;
   position: relative;
-  background:rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
   width: 280px;
   height: auto;
-  cursor: pointer;
-  margin: 16px 12px 0 0;
+  margin: 22px 12px 0 0;
   padding: 0;
 }
 .dropdown-label {
@@ -145,16 +142,16 @@ body {
 .dropdown-arrow path {
   fill: white;
 }
-.dropdown-arrow.expanded {
+.dropdown-selected[aria-expanded="true"] ~ .dropdown-arrow {
   transform: rotate(-180deg);
 }
 .dropdown-list {
   width: 100%;
   position: absolute;
   left: 0;
+  background: rgb(58, 44, 25);
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
-  background:rgba(255, 255, 255, 0.15);
   transition: opacity 0.1s cubic-bezier(0, 0, 0.38, 0.9), max-height 0.5s cubic-bezier(0, 0, 0.38, 0.9);
   max-height: 0;
   overflow: hidden;
@@ -163,30 +160,17 @@ body {
   border-top: none;
   box-sizing: border-box;
 }
-.dropdown ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.dropdown li {
+.dropdown button {
   padding: 6px;
   cursor: pointer;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+  margin: 0;
 }
-.dropdown li:hover,
-.dropdown li:focus {
+.dropdown button:hover,
+.dropdown button:focus {
   background: rgba(255, 255, 255, 0.1);
-}
-.dropdown li.dropdown-label {
-  cursor: default;
-  padding: 0;
-}
-.dropdown li.dropdown-label:hover,
-.dropdown li.dropdown-label:focus {
-  background: none;
-}
-li.dropdown-list-container {
-  position: relative;
-  padding: 0;
 }
 .dropdown-list-item {
   transition: background-color 0.1s linear, color 0.1s linear;
@@ -194,13 +178,13 @@ li.dropdown-list-container {
   box-sizing: border-box;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
-.dropdown-list-item:first-child {
-  border-top: none;
+button.dropdown-list-item[aria-selected="true"] {
+  background: rgba(0, 0, 0, 0.1);
 }
-.dropdown li:focus {
+.dropdown button:focus {
   outline: 1px solid #ffdb3d;
 }
-.dropdown.open .dropdown-list {
+.dropdown-selected[aria-expanded="true"] ~ .dropdown-list {
   opacity: 1;
   overflow-y: auto;
   max-height: 90vh;
@@ -266,7 +250,7 @@ li.dropdown-list-container {
   border-color: #005ea2;
 }
 button.next-prompt {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   padding: 6px 12px;
 }
 
