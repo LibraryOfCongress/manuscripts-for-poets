@@ -303,7 +303,6 @@ button.next-prompt {
 
 .modal {
   position: absolute;
-  z-index: 999;
   top: 20px;
   bottom: 20px;
   left: 20px;
@@ -314,10 +313,12 @@ button.next-prompt {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  display: none;
+  z-index: -1;
+  transform: translate(-99999px, 0);
 }
 .modal.active {
-  display: flex;
+  z-index: 9999;
+  transform: translate(0, 0);
 }
 .modal .document {
   flex-grow: 1;

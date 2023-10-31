@@ -280,21 +280,42 @@ class App {
 
   renderDocument() {
     const {
-      documents, $documentModal, currentPromptIndex, prompts,
+      documents, $documentModal, currentPromptIndex, filteredPrompts,
     } = this;
-    const prompt = prompts[currentPromptIndex];
+    const prompt = filteredPrompts[currentPromptIndex];
     const doc = documents[prompt.doc];
     const $document = $documentModal.find('#document-container');
     const $title = $documentModal.find('.resource-link');
     const text = doc.Transcription.replace(/\s+/g, ' ').replace(/\s\s+/g, ' ');
-    const matchText = text.replace(prompt.text, `<strong>${prompt.text}</strong>`);
+    const matchText = text.replace(prompt.text, `</span><strong>${prompt.text}</strong><span>`);
     let html = '';
-    html += `<div class="pane transcript"><p>${matchText}</p></div>`;
+    html += `<div id="transcript-pane" class="pane transcript"><p><span>${matchText}</span></p></div>`;
     html += `<div class="pane image" style="background-image: url(${doc.DownloadUrl})"></div>`;
     $document.html(html);
     $title.text(doc.Item);
     $title.attr('href', doc.itemUrl);
-    this.constructor.preloadImage(doc.DownloadUrl);
+    // this.constructor.preloadImage(doc.DownloadUrl);
+    // check if highligthed text is visible
+    setTimeout(() => {
+      const $pane = $('#transcript-pane');
+      const $highlighted = $pane.find('strong').first();
+      if ($highlighted.length > 0) {
+        const $transcript = $pane.find('p').first();
+        const pHeight = $pane.height();
+        const highlightedY = $highlighted.position().top;
+        const thresholdTop = pHeight * 0.667;
+        const targetTop = pHeight * 0.4;
+        if (highlightedY > thresholdTop) {
+          // console.log(highlightedY, thresholdTop);
+          const tHeight = $transcript.height();
+          const maxTop = tHeight - pHeight;
+          const pScrollTop = Math.min(highlightedY - targetTop, maxTop);
+          if (pScrollTop > 0) {
+            $pane.scrollTop(pScrollTop);
+          }
+        }
+      }
+    }, 100);
   }
 
   renderNextPrompt() {
