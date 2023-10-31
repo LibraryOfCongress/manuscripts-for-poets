@@ -70,77 +70,74 @@
             <div class="prompt-options">
 
                 <div class="prompt-option">
-                    <ul class="dropdown">
-                        <li id="dropdown-time-period" class="dropdown-label">Select a time period</li>
+                    <div class="dropdown">
+                        <div id="dropdown-time-period" class="dropdown-label">Select a time period</div>
 
-                        <li role="button" aria-labelledby="dropdown-time-period" id="dropdown-selected" tabindex="0">
-                            <div class="option-title">Any (1863-1954)</div>
-                        </li>
+                        <button class="dropdown-selected" aria-labelledby="dropdown-time-period" role="combobox" aria-controls="dropdown-list-time-period" aria-owns="dropdown-list-time-period" aria-expanded="false">
+                            Any (1863-1954)
+                        </button>
 
                         <svg class="dropdown-arrow" width="10" height="5" viewBox="0 0 10 5" fill-rule="evenodd">
                             <title>Open drop down</title>
                             <path d="M10 0L5 5 0 0z"></path>
                         </svg>
 
-                        <li aria-expanded="false" role="list" class="dropdown-list-container">
-                            <ul class="dropdown-list">
-                                <li class="dropdown-list-item" tabindex="0" id="time-period-any" data-value="any">
-                                    <div class="option-title">Any (1863-1954)</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="time-period-1863-1891" data-value="1863-1891">
-                                    <div class="option-title">Student and teacher (1863-1891)</div>
-                                    <div class="option-description">Terrell attends "Model School" for children, Oberlin College, studies overseas, and teaches at High School for Colored Youth</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="time-period-1892-1919" data-value="1892-1919">
-                                    <div class="option-title">Lifting as we climb (1892-1919)</div>
-                                    <div class="option-description">Terrell becomes active in woman's suffrage movement, and organizes and becomes the first president of the National Association of Colored Women.</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="time-period-1920-1939" data-value="1920-1939">
-                                    <div class="option-title">Integration and politics (1920-1939)</div>
-                                    <div class="option-description">Following the passage of the 19th amendment, Terrell focused on broader civil rights, campaigning tirelessly among black organizations and mainstream white organizations.</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="time-period-1940-1954" data-value="1940-1954">
-                                    <div class="option-title">Genteel Militant (1940-1954)</div>
-                                    <div class="option-description">After World War II, Terrell joined the burgeoning efforts to end legal segregation.</div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                        <div id="dropdown-list-time-period" class="dropdown-list" aria-labelledby="dropdown-time-period" role="listbox" hidden>
+                            <button role="option" aria-selected="true" class="dropdown-list-item" id="time-period-any" data-value="any">
+                                <div class="option-title">Any (1863-1954)</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="time-period-1863-1891" data-value="1863-1891">
+                                <div class="option-title">Student and teacher (1863-1891)</div>
+                                <div class="option-description">Terrell attends "Model School" for children, Oberlin College, studies overseas, and teaches at High School for Colored Youth</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="time-period-1892-1919" data-value="1892-1919">
+                                <div class="option-title">Lifting as we climb (1892-1919)</div>
+                                <div class="option-description">Terrell becomes active in woman's suffrage movement, and organizes and becomes the first president of the National Association of Colored Women.</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="time-period-1920-1939" data-value="1920-1939">
+                                <div class="option-title">Integration and politics (1920-1939)</div>
+                                <div class="option-description">Following the passage of the 19th amendment, Terrell focused on broader civil rights, campaigning tirelessly among black organizations and mainstream white organizations.</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="time-period-1940-1954" data-value="1940-1954">
+                                <div class="option-title">Genteel Militant (1940-1954)</div>
+                                <div class="option-description">After World War II, Terrell joined the burgeoning efforts to end legal segregation.</div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="prompt-option">
-                    <ul class="dropdown">
-                        <li id="dropdown-medium" class="dropdown-label">Select a medium</li>
+                    <div class="dropdown">
 
-                        <li role="button" aria-labelledby="dropdown-medium" id="dropdown-selected" tabindex="0">
-                            <div class="option-title">Any</div>
-                        </li>
+                        <div id="dropdown-medium" class="dropdown-label">Select a medium</div>
+
+                        <button class="dropdown-selected" aria-labelledby="dropdown-medium" role="combobox" aria-controls="dropdown-list-medium" aria-owns="dropdown-list-medium" aria-expanded="false">
+                            Any
+                        </button>
 
                         <svg class="dropdown-arrow" width="10" height="5" viewBox="0 0 10 5" fill-rule="evenodd">
                             <title>Open drop down</title>
                             <path d="M10 0L5 5 0 0z"></path>
                         </svg>
 
-                        <li aria-expanded="false" role="list" class="dropdown-list-container">
-                            <ul class="dropdown-list">
-                                <li class="dropdown-list-item" tabindex="0" id="medium-any" data-value="any">
-                                    <div class="option-title">Any</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="medium-diaries" data-value="Diaries and journals: 1888-1951">
-                                    <div class="option-title">Diaries and Journals</div>
-                                    <div class="option-description">Terrell's personal diaries written in French and German during Terrell's stay in Europe, and later kept in English.</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="medium-letters" data-value="Family letters ">
-                                    <div class="option-title">Family Letters</div>
-                                    <div class="option-description">Terrell's correspondence with family, including her husband, siblings, and daughters.</div>
-                                </li>
-                                <li class="dropdown-list-item" tabindex="0" id="medium-speeches" data-value="Speeches and writings">
-                                    <div class="option-title">Speeches and Writings</div>
-                                    <div class="option-description">Terrell's essays, speeches, articles, poems, and short stories.</div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                        <div id="dropdown-list-medium" class="dropdown-list" aria-labelledby="dropdown-medium" role="listbox" hidden>
+                            <button role="option" aria-selected="true" class="dropdown-list-item" id="medium-any" data-value="any">
+                                <div class="option-title">Any</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="medium-diaries" data-value="Diaries and journals: 1888-1951">
+                                <div class="option-title">Diaries and Journals</div>
+                                <div class="option-description">Terrell's personal diaries written in French and German during Terrell's stay in Europe, and later kept in English.</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="medium-letters" data-value="Family letters ">
+                                <div class="option-title">Family Letters</div>
+                                <div class="option-description">Terrell's correspondence with family, including her husband, siblings, and daughters.</div>
+                            </button>
+                            <button role="option" class="dropdown-list-item" id="medium-speeches" data-value="Speeches and writings">
+                                <div class="option-title">Speeches and Writings</div>
+                                <div class="option-description">Terrell's essays, speeches, articles, poems, and short stories.</div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <button class="next-prompt">Generate prompt</button>

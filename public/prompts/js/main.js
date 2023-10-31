@@ -52,6 +52,10 @@ class App {
     });
   }
 
+  filterPrompts() {
+    const { prompts } = this;
+  }
+
   loadListeners() {
     $('.start').on('click', (e) => {
       $('.app').addClass('active');
@@ -64,6 +68,14 @@ class App {
 
     $('.next-prompt').on('click', (e) => {
       this.renderNextPrompt();
+    });
+
+    $('.dropdown-selected').on('click', (e) => {
+      this.constructor.toggleMenu($(e.currentTarget));
+    });
+
+    $('.dropdown-list-item').on('click', (e) => {
+      this.selectOption($(e.currentTarget));
     });
 
     this.$meta.on('click', '.show-doc', (e) => {
@@ -205,8 +217,32 @@ class App {
     this.renderDocument();
   }
 
+  selectOption($selectButton) {
+    const $dropdown = $selectButton.closest('.dropdown');
+    const $selected = $dropdown.find('.dropdown-selected');
+    $dropdown.find('.dropdown-list-item').attr('aria-selected', 'false');
+    $selectButton.attr('aria-selected', 'true');
+    $selected.text($selectButton.find('.option-title').text());
+    $selected.attr('aria-expanded', 'false');
+    $dropdown.find('.dropdown-list')[0].hidden = true;
+    this.filterPrompts();
+  }
+
   showDocument() {
     this.$documentModal.addClass('active');
+  }
+
+  static toggleMenu($menuButton) {
+    const value = $menuButton.attr('aria-expanded');
+    const controls = $menuButton.attr('aria-controls');
+    const sublist = $(`#${controls}`)[0];
+    if (value === 'true') {
+      $menuButton.attr('aria-expanded', 'false');
+      sublist.hidden = true;
+    } else {
+      $menuButton.attr('aria-expanded', 'true');
+      sublist.hidden = false;
+    }
   }
 }
 
