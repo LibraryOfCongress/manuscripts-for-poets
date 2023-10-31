@@ -342,9 +342,6 @@ button.next-prompt {
 }
 .modal .document .transcript {
   font-family: 'Courier New', Courier, monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow-y: auto;
 }
 .modal .document .transcript strong {
@@ -373,4 +370,11 @@ button.next-prompt {
   position: absolute;
   top: 3px;
   right: 3px;
+  font-size: 2rem;
+  padding: 0;
+  line-height: 36px;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  margin: 0;
 }
