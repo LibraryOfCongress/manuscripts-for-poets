@@ -3,13 +3,20 @@ class App {
     const defaults = {
       project: 'mary-church-terrell',
     };
-    const qparams = StringUtil.queryParams();
-    this.options = _.extend({}, defaults, options, qparams);
+    this.options = _.extend({}, defaults, options);
     this.init();
   }
 
   init() {
-    this.currentPromptIndex = -1;
+    this.defaultState = {
+      filters: {
+        Project: 'any',
+        EstimatedYear: 'any',
+      },
+      prompt: -1,
+    };
+    const qparams = StringUtil.queryParams();
+    this.setState(qparams);
 
     this.$main = $('#main-content');
     this.$intro = $('#intro');
@@ -47,23 +54,23 @@ class App {
     });
 
     this.loadFilters();
+    this.renderFilters();
     $.when(promptDataPromise, transcriptDataPromise, imagePromise).done((pdata, tdata, idata) => {
       this.onTranscriptDataLoad(tdata[0].docs);
       this.onPromptDataLoad(pdata[0]);
     });
   }
 
-  filterPrompts() {
-    const { prompts, dataFilters } = this;
+  filterPrompts(resetIndex = true) {
+    const { prompts, state } = this;
 
     const filteredPrompts = prompts.filter((prompt) => {
       let isVisible = true;
-      _.each(dataFilters, (dataFilter, key) => {
-        const { currentValue } = dataFilter;
+      _.each(state.filters, (currentValue, key) => {
         const pvalue = prompt[key];
         if (currentValue !== 'any') {
-          if (Array.isArray(currentValue)) {
-            const [start, end] = currentValue;
+          if (key === 'EstimatedYear' && currentValue.includes('-')) {
+            const [start, end] = currentValue.split('-', 2).map((v) => parseInt(v, 10));
             if (pvalue !== '' && (pvalue < start || pvalue >= end)) isVisible = false;
           } else if (pvalue !== currentValue) isVisible = false;
         }
@@ -92,7 +99,7 @@ class App {
       this.filteredPrompts = starred.concat(unstarred);
     }
 
-    this.currentPromptIndex = -1;
+    if (resetIndex) this.state.prompt = -1;
   }
 
   loadListeners() {
@@ -120,39 +127,33 @@ class App {
     this.$meta.on('click', '.show-doc', (e) => {
       this.showDocument();
     });
+
+    window.addEventListener('popstate', (event) => {
+      console.log(event.state);
+    });
   }
 
   loadFilters() {
     const dataFilters = {};
     $('.data-option').each((i, el) => {
       const name = el.getAttribute('data-name');
-      let value = el.getAttribute('data-value');
-      if (name === 'EstimatedYear' && value.includes('-')) {
-        value = value.split('-', 2).map((v) => parseInt(v, 10));
-      }
+      const value = el.getAttribute('data-value');
       if (_.has(dataFilters, name)) {
         dataFilters[name].values.push(value);
       } else {
-        dataFilters[name] = { values: [value], currentValue: 'any' };
+        dataFilters[name] = { values: [value] };
       }
     });
     this.dataFilters = dataFilters;
   }
 
   onFilter($selectButton) {
-    const $dropdown = $selectButton.closest('.dropdown');
-    const $selected = $dropdown.find('.dropdown-selected');
+    this.constructor.renderFilterSelect($selectButton);
     const name = $selectButton.attr('data-name');
     const value = $selectButton.attr('data-value');
-    $dropdown.find('.dropdown-list-item').attr('aria-selected', 'false');
-    $selectButton.attr('aria-selected', 'true');
-    $selected.text($selectButton.find('.option-title').text());
-    $selected.attr('aria-expanded', 'false');
-    $dropdown.find('.dropdown-list')[0].hidden = true;
-    if (name === 'EstimatedYear' && value.includes('-')) {
-      this.dataFilters[name].currentValue = value.split('-', 2).map((v) => parseInt(v, 10));
-    } else this.dataFilters[name].currentValue = value;
+    this.state.filters[name] = value;
     this.filterPrompts();
+    this.pushState();
   }
 
   onImageLoad(images) {
@@ -229,7 +230,7 @@ class App {
       updatedPrompt.itemUrl = `https://www.loc.gov/resource/${prompt.ResourceID}/?sp=${prompt.ItemAssetIndex}&st=text`;
       return updatedPrompt;
     }, true);
-    this.filterPrompts();
+    this.filterPrompts(false);
     this.timeRange = data.timeRange;
     this.subCollections = data.subCollections;
 
@@ -237,7 +238,8 @@ class App {
 
     this.promptDataLoaded = true;
     this.$main.removeClass('is-loading');
-    this.renderNextPrompt();
+    if (this.state.prompt >= 0) this.renderPrompt();
+    else this.renderNextPrompt();
     this.loadListeners();
   }
 
@@ -292,11 +294,24 @@ class App {
     console.log(printBuckets);
   }
 
+  pushState() {
+    const { state, defaultState } = this;
+    const urlState = {};
+    _.each(state.filters, (value, key) => {
+      if (defaultState.filters[key] !== value) {
+        urlState[key] = value;
+      }
+      if (state.prompt !== defaultState.prompt) urlState.prompt = state.prompt;
+    });
+    console.log(state, defaultState, urlState);
+    StringUtil.pushURLState(urlState);
+  }
+
   renderDocument() {
     const {
-      documents, $documentModal, currentPromptIndex, filteredPrompts,
+      documents, $documentModal, state, filteredPrompts,
     } = this;
-    const prompt = filteredPrompts[currentPromptIndex];
+    const prompt = filteredPrompts[state.prompt];
     const doc = documents[prompt.doc];
     const $document = $documentModal.find('#document-container');
     const $title = $documentModal.find('.resource-link');
@@ -332,23 +347,52 @@ class App {
     }, 100);
   }
 
+  renderFilters() {
+    _.each(this.state.filters, (value, key) => {
+      const $button = $(`.data-option[data-name="${key}"][data-value="${value}"]`).first();
+      this.constructor.renderFilterSelect($button);
+    });
+  }
+
+  static renderFilterSelect($selectButton) {
+    const $dropdown = $selectButton.closest('.dropdown');
+    const $selected = $dropdown.find('.dropdown-selected');
+    $dropdown.find('.dropdown-list-item').attr('aria-selected', 'false');
+    $selectButton.attr('aria-selected', 'true');
+    $selected.text($selectButton.find('.option-title').text());
+    $selected.attr('aria-expanded', 'false');
+    $dropdown.find('.dropdown-list')[0].hidden = true;
+  }
+
   renderNextPrompt() {
-    this.currentPromptIndex += 1;
-    if (this.currentPromptIndex >= this.filteredPrompts.length) this.currentPromptIndex = 0;
-    const prompt = this.filteredPrompts[this.currentPromptIndex];
+    this.state.prompt += 1;
+    if (this.state.prompt >= this.filteredPrompts.length) this.state.prompt = 0;
+    this.renderPrompt();
+    this.pushState();
+  }
+
+  renderPrompt() {
+    const currentPromptIndex = this.state.prompt;
+    const prompt = this.filteredPrompts[currentPromptIndex];
     this.$prompt.html(`<p>${prompt.text}</p>`);
 
     let html = '';
     html += '<h2>Mary Church Terrell Papers</h2>';
     html += `<h3>${prompt.Item} <button class="show-doc">View in context</button></h3>`;
     this.$meta.html(html);
-    // const variance = 5;
-    // const r = Math.round(MathUtil.lerp(102 - variance, 102 + variance, Math.random()));
-    // const g = Math.round(MathUtil.lerp(71 - variance, 71 + variance, Math.random()));
-    // const b = Math.round(MathUtil.lerp(32 - variance, 32 + variance, Math.random()));
-    // const alpha = MathUtil.lerp(0.25, 1, Math.random());
-    // this.$main.css('background-color', `rgba(${r}, ${g}, ${b}, ${alpha})`);
+
     this.renderDocument();
+  }
+
+  setState(data) {
+    const state = structuredClone(this.defaultState);
+    _.each(state.filters, (value, name) => {
+      if (_.has(data, name)) {
+        state.filters[name] = data[name];
+      }
+    });
+    if (_.has(data, 'prompt')) state.prompt = data.prompt;
+    this.state = state;
   }
 
   showDocument() {
