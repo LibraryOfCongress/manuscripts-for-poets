@@ -196,7 +196,7 @@ class App {
     });
 
     setTimeout(() => {
-      $container.css('opacity', '0.075');
+      $container.css('opacity', '0.333');
       this.$intro.addClass('active');
       $('.collage-image').css('transition', 'none');
       // move the images when the mouse moves
