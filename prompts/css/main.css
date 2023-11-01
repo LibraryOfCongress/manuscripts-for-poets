@@ -20,10 +20,12 @@ body {
 }
 
 .main-content button {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(90, 72, 34, 0.667);
+  border: 1px solid rgba(255, 255, 255, 0.333);
+  box-sizing: border-box;
 }
 .main-content button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(90, 72, 34, 0.8);
 }
 .main-content a,
 .main-content a:visited {
@@ -57,9 +59,10 @@ body {
 }
 .intro h1 {
   letter-spacing: 2px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 .intro h1 .names {
-  color: rgb(161, 120, 70);
+  color: rgb(243, 188, 121);
 }
 .intro p {
   margin: 0 0 0.8rem;
@@ -278,6 +281,7 @@ button.next-prompt {
   align-items: center;
   box-sizing: border-box;
   padding: 24px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 .prompt-text p {
   margin: 0;
