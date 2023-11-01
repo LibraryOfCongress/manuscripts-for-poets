@@ -153,7 +153,6 @@ class App {
     const value = $selectButton.attr('data-value');
     this.state.filters[name] = value;
     this.filterPrompts();
-    this.pushState();
   }
 
   onImageLoad(images) {
@@ -303,7 +302,7 @@ class App {
       }
       if (state.prompt !== defaultState.prompt) urlState.prompt = state.prompt;
     });
-    console.log(state, defaultState, urlState);
+    // console.log(state, defaultState, urlState);
     StringUtil.pushURLState(urlState);
   }
 
