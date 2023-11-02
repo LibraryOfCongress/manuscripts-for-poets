@@ -19,12 +19,14 @@ body {
   overflow: hidden;
 }
 
-.main-content button {
+.main-content button,
+.main-content .button {
   background-color: rgba(90, 72, 34, 0.667);
   border: 1px solid rgba(255, 255, 255, 0.333);
   box-sizing: border-box;
 }
-.main-content button:hover {
+.main-content button:hover,
+.main-content .button:hover {
   background-color: rgba(90, 72, 34, 0.8);
 }
 .main-content a,
@@ -469,6 +471,31 @@ button.next-prompt {
   height: 36px;
   text-align: center;
   margin: 0;
+}
+
+.saved-prompts-container {
+  overflow: hidden;
+  overflow-y: auto;
+  padding-top: 46px;
+  flex-grow: 1;
+}
+.saved-prompt {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  box-sizing: border-box;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  gap: 6px;
+}
+.saved-prompt .text {
+  flex-grow: 1;
+  font-family: 'Courier New', Courier, monospace;
+}
+button.download-saved-prompts {
+  display: flex;
+}
+button.download-saved-prompts path {
+  fill: white;
 }
 
 @media screen and (max-width: 1000px) {

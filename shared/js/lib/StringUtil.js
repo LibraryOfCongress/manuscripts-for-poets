@@ -1,4 +1,17 @@
 class StringUtil {
+  static downloadText(filename, text, format = 'txt') {
+    const linkId = 'download-link';
+    const uri = `data:application/${format},${encodeURIComponent(text)}`;
+    let $link = $(`#${linkId}`);
+    if ($link.length <= 0) {
+      $link = $(`<a id="${linkId}" class="visually-hidden">hidden link</a>`);
+      $('body').append($link);
+    }
+    $link.attr('href', uri);
+    $link.attr('download', filename);
+    $link[0].click();
+  }
+
   static getHighlightedText(text, textToHighlight, wordsBeforeCount = -1, wordsAfterCount = -1) {
     const regex = new RegExp(textToHighlight.split(/\s+/).filter((i) => i?.length).join('|'), 'gi');
     const textNormalized = text.replace(/\s+/g, ' ');
