@@ -68,6 +68,20 @@ class App {
     });
   }
 
+  downloadSavedPrompts() {
+    const { savedPrompts } = this;
+    if (savedPrompts.length <= 0) return;
+    const rows = _.map(savedPrompts, (p) => {
+      const cols = _.pick(p, 'text', 'itemUrl');
+      const values = _.values(cols);
+      const escaped = values.map((value) => `"${value.replaceAll('"', '\\"')}"`);
+      return escaped.join(',');
+    });
+    rows.unshift('text,url');
+    const text = rows.join('\n');
+    StringUtil.downloadText('prompts.csv', text, 'csv');
+  }
+
   filterPrompts(resetIndex = true) {
     const { prompts, state } = this;
 
@@ -138,7 +152,9 @@ class App {
     });
 
     this.$main.on('click', '.show-doc', (e) => {
-      this.showDocument();
+      const $button = $(e.currentTarget);
+      const index = parseInt($button.attr('data-index'), 10);
+      this.showDocument(index);
     });
 
     this.$main.on('click', '.bookmark-prompt', (e) => {
@@ -146,6 +162,21 @@ class App {
       $button.toggleClass('active');
       if ($button.hasClass('active')) this.savePrompt();
       else this.unsavePrompt();
+    });
+
+    this.$main.on('click', '.view-saved-prompts', (e) => {
+      this.renderSavedPrompts();
+    });
+
+    this.$main.on('click', '.remove-saved-prompt', (e) => {
+      const $button = $(e.currentTarget);
+      const index = parseInt($button.attr('data-index'), 10);
+      this.unsavePrompt(index);
+      this.renderSavedPrompts();
+    });
+
+    $('.download-saved-prompts').on('click', (e) => {
+      this.downloadSavedPrompts();
     });
 
     this.$statePrev.on('click', (e) => {
@@ -374,11 +405,16 @@ class App {
     }
   }
 
-  renderDocument() {
+  renderDocument(promptIndex = false) {
     const {
-      documents, $documentModal, state, filteredPrompts,
+      documents, $documentModal, state, filteredPrompts, prompts,
     } = this;
-    const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
+    let prompt;
+    if (promptIndex !== false) {
+      prompt = this.constructor.getPrompt(prompts, promptIndex);
+    } else {
+      prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
+    }
     const doc = documents[prompt.doc];
     const $document = $documentModal.find('#document-container');
     const $title = $documentModal.find('.resource-link');
@@ -453,7 +489,7 @@ class App {
     html += '<svg class="zoom-in-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>';
     html += '</svg></button>';
-    html += `<button class="bookmark-prompt ${(isSaved ? 'active' : '')}" title="Save prompt">`;
+    html += `<button class="bookmark-prompt ${(isSaved ? 'active' : '')}" title="Save prompt" data-index="${prompt.index}">`;
     html += '<span class="visually-hidden">Save prompt</span>';
     html += '<svg class="bookmark-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>';
@@ -471,6 +507,24 @@ class App {
     this.$meta.html(html);
 
     this.renderDocument();
+  }
+
+  renderSavedPrompts() {
+    const { savedPrompts } = this;
+    if (savedPrompts.length <= 0) return;
+    const $modal = $('#saved-prompts');
+    const $container = $('#saved-prompts-container');
+    let html = '';
+    savedPrompts.forEach(({ text, index, itemUrl }) => {
+      html += '<div class="saved-prompt">';
+      html += `<div class="text">${text}</div>`;
+      html += `<button class="show-doc" data-index="${index}">View in context</button>`;
+      html += `<a href="${itemUrl}" class="button" target="_blank">View on loc.gov</a>`;
+      html += `<button class="remove-saved-prompt" data-index="${index}">Remove</button>`;
+      html += '</div>';
+    });
+    $container.html(html);
+    $modal.addClass('active');
   }
 
   renderStateButtons() {
@@ -503,7 +557,10 @@ class App {
     this.state = state;
   }
 
-  showDocument() {
+  showDocument(promptIndex) {
+    if (promptIndex) {
+      this.renderDocument(promptIndex);
+    }
     this.$documentModal.addClass('active');
   }
 
@@ -520,9 +577,13 @@ class App {
     }
   }
 
-  unsavePrompt() {
-    const { state, filteredPrompts } = this;
-    const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
+  unsavePrompt(promptIndex = false) {
+    const { state, filteredPrompts, prompts } = this;
+    let prompt;
+    if (promptIndex) {
+      prompt = this.constructor.getPrompt(prompts, promptIndex);
+      $(`.bookmark-prompt[data-index="${promptIndex}"]`).removeClass('active');
+    } else prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
     this.savedPrompts = _.reject(this.savedPrompts, (p) => p.index === prompt.index);
     StringUtil.saveToStorage('saved-prompts', this.savedPrompts);
     this.renderBookmarkButton();
