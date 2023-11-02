@@ -206,6 +206,20 @@ button.dropdown-list-item[aria-selected="true"] {
   align-items: stretch;
   position: relative;
 }
+button.prompt-nav {
+  display: none;
+}
+button.prompt-nav.active {
+  display: block;
+}
+button.prompt-nav,
+button.prompt-nav:hover {
+  background: none;
+  border: none;
+}
+button.prompt-nav path {
+  fill: white;
+}
 .prompt-controls {
   display: flex;
   align-items: flex-end;

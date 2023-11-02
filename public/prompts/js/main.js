@@ -23,6 +23,11 @@ class App {
     this.$prompt = $('#prompt-text');
     this.$meta = $('#meta');
     this.$documentModal = $('#document-browser');
+    this.$statePrev = $('.state-prev');
+    this.$stateNext = $('.state-next');
+
+    this.stateHistory = [];
+    this.stateIndex = -1;
 
     const promptDataURL = `../data/${this.options.project}/prompts.json`;
     const promptDataPromise = $.getJSON(promptDataURL, (data) => data);
@@ -134,6 +139,14 @@ class App {
       this.showDocument();
     });
 
+    this.$statePrev.on('click', (e) => {
+      window.history.back();
+    });
+
+    this.$stateNext.on('click', (e) => {
+      window.history.forward();
+    });
+
     window.addEventListener('popstate', (event) => {
       this.onPopState(event.state);
     });
@@ -231,6 +244,18 @@ class App {
     this.filterPrompts(false);
     this.renderFilters();
     this.renderPrompt();
+
+    // activate or deactivate prev/next buttons based on where we are in state history
+    const stateString = $.param(state);
+    let stateIndex = _.indexOf(this.stateHistory, stateString);
+    // state not found; probably from previous history
+    if (stateIndex < 0) {
+      // add it to the beginning of the history
+      this.stateHistory.unshift(stateString);
+      stateIndex = 0;
+    }
+    this.stateIndex = stateIndex;
+    this.renderStateButtons();
   }
 
   onPromptDataLoad(data) {
@@ -250,8 +275,10 @@ class App {
 
     this.promptDataLoaded = true;
     this.$main.removeClass('is-loading');
-    if (this.state.prompt >= 0) this.renderPrompt();
-    else this.renderNextPrompt();
+    if (this.state.prompt >= 0) {
+      this.renderPrompt();
+      this.pushState();
+    } else this.renderNextPrompt();
     this.loadListeners();
   }
 
@@ -317,6 +344,15 @@ class App {
     });
     // console.log(state, defaultState, urlState);
     StringUtil.pushURLState(urlState);
+
+    // keep track of state
+    const newStateHistory = this.stateIndex >= 0
+      ? this.stateHistory.slice(0, this.stateIndex + 1)
+      : this.stateHistory.slice();
+    newStateHistory.push($.param(urlState));
+    this.stateHistory = newStateHistory;
+    this.stateIndex = this.stateHistory.length - 1;
+    this.renderStateButtons();
   }
 
   renderDocument() {
@@ -396,6 +432,14 @@ class App {
     this.$meta.html(html);
 
     this.renderDocument();
+  }
+
+  renderStateButtons() {
+    const { stateIndex, stateHistory } = this;
+    if (stateIndex >= (stateHistory.length - 1)) this.$stateNext.removeClass('active');
+    else this.$stateNext.addClass('active');
+    if (stateIndex <= 0) this.$statePrev.removeClass('active');
+    else this.$statePrev.addClass('active');
   }
 
   setState(data) {
