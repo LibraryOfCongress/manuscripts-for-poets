@@ -305,6 +305,30 @@ button.next-prompt {
   animation: fadeIn 2s ease-in-out;
   animation-fill-mode: both;
   max-width: 800px;
+  position: relative;
+}
+.prompt-actions {
+  white-space: nowrap;
+  display: block;
+  position: absolute;
+  bottom: -8vmin;
+  right: -8vmin;
+}
+.prompt-actions button,
+.prompt-actions button:hover {
+  background: none;
+  border: none;
+  padding: 0;
+}
+.prompt-actions svg {
+  width: 4vmin;
+  height: 4vmin;
+}
+.prompt-actions path {
+  fill: rgb(252, 183, 98);
+}
+.prompt-actions button:hover path {
+  fill:rgb(254, 218, 173);
 }
 .meta {
   box-sizing: border-box;

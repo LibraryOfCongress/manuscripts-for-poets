@@ -135,7 +135,7 @@ class App {
       this.onFilter($(e.currentTarget));
     });
 
-    this.$meta.on('click', '.show-doc', (e) => {
+    this.$main.on('click', '.show-doc', (e) => {
       this.showDocument();
     });
 
@@ -424,9 +424,21 @@ class App {
   renderPrompt() {
     const { state, filteredPrompts } = this;
     const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
-    this.$prompt.html(`<p>${prompt.text}</p>`);
-
     let html = '';
+    html += '<p>';
+    html += prompt.text;
+    html += '<span class="prompt-actions">';
+    html += '<button class="show-doc"><svg class="zoom-in-icon" width="24" height="24" viewBox="0 0 24 24">';
+    html += '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>';
+    html += '</svg></button>';
+    html += '<button class="bookmark-prompt"><svg class="bookmark-icon" width="24" height="24" viewBox="0 0 24 24">';
+    html += '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>';
+    html += '</svg></button>';
+    html += '</span>';
+    html += '</p>';
+    this.$prompt.html(html);
+
+    html = '';
     html += '<h2>Mary Church Terrell Papers</h2>';
     html += `<h3>${prompt.Item} <button class="show-doc">View in context</button></h3>`;
     this.$meta.html(html);
