@@ -25,6 +25,11 @@ class StringUtil {
     return highlighted;
   }
 
+  static loadFromStorage(key) {
+    const value = window.localStorage.getItem(key);
+    return value ? JSON.parse(value) : false;
+  }
+
   static loadTemplateFromElement(id, renderer, data) {
     const templateString = document.getElementById(id.replace('#', '')).innerHTML;
     return StringUtil.loadTemplateFromString(templateString, renderer, data);
@@ -67,5 +72,9 @@ class StringUtil {
       parsed[dkey] = value;
     });
     return parsed;
+  }
+
+  static saveToStorage(key, value) {
+    window.localStorage.setItem(key, JSON.stringify(value));
   }
 }
