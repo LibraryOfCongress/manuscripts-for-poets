@@ -29,6 +29,8 @@ class App {
     this.stateHistory = [];
     this.stateIndex = -1;
 
+    this.savedPrompts = StringUtil.loadFromStorage('saved-prompts') || [];
+
     const promptDataURL = `../data/${this.options.project}/prompts.json`;
     const promptDataPromise = $.getJSON(promptDataURL, (data) => data);
 
@@ -137,6 +139,13 @@ class App {
 
     this.$main.on('click', '.show-doc', (e) => {
       this.showDocument();
+    });
+
+    this.$main.on('click', '.bookmark-prompt', (e) => {
+      const $button = $(e.currentTarget);
+      $button.toggleClass('active');
+      if ($button.hasClass('active')) this.savePrompt();
+      else this.unsavePrompt();
     });
 
     this.$statePrev.on('click', (e) => {
@@ -355,6 +364,16 @@ class App {
     this.renderStateButtons();
   }
 
+  renderBookmarkButton() {
+    const { savedPrompts } = this;
+    const $button = $('.view-saved-prompts');
+    if (savedPrompts.length > 0) {
+      $button.text(savedPrompts.length.toLocaleString()).addClass('active');
+    } else {
+      $button.removeClass('active');
+    }
+  }
+
   renderDocument() {
     const {
       documents, $documentModal, state, filteredPrompts,
@@ -422,18 +441,26 @@ class App {
   }
 
   renderPrompt() {
-    const { state, filteredPrompts } = this;
+    const { state, filteredPrompts, savedPrompts } = this;
     const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
+    const isSaved = _.find(savedPrompts, (p) => p.index === prompt.index);
     let html = '';
     html += '<p>';
     html += prompt.text;
     html += '<span class="prompt-actions">';
-    html += '<button class="show-doc"><svg class="zoom-in-icon" width="24" height="24" viewBox="0 0 24 24">';
+    html += '<button class="show-doc" title="View in context">';
+    html += '<span class="visually-hidden">View in context</span>';
+    html += '<svg class="zoom-in-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>';
     html += '</svg></button>';
-    html += '<button class="bookmark-prompt"><svg class="bookmark-icon" width="24" height="24" viewBox="0 0 24 24">';
+    html += `<button class="bookmark-prompt ${(isSaved ? 'active' : '')}" title="Save prompt">`;
+    html += '<span class="visually-hidden">Save prompt</span>';
+    html += '<svg class="bookmark-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>';
     html += '</svg></button>';
+    html += `<button class="view-saved-prompts ${(savedPrompts.length > 0 ? 'active' : '')}" title="View saved prompts">`;
+    html += savedPrompts.length.toLocaleString();
+    html += '</button>';
     html += '</span>';
     html += '</p>';
     this.$prompt.html(html);
@@ -452,6 +479,17 @@ class App {
     else this.$stateNext.addClass('active');
     if (stateIndex <= 0) this.$statePrev.removeClass('active');
     else this.$statePrev.addClass('active');
+  }
+
+  savePrompt() {
+    const { state, filteredPrompts } = this;
+    const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
+    // check if already saved
+    if (_.find(this.savedPrompts, (p) => p.index === prompt.index)) return;
+    const promptData = _.pick(prompt, 'text', 'index', 'itemUrl');
+    this.savedPrompts.push(promptData);
+    StringUtil.saveToStorage('saved-prompts', this.savedPrompts);
+    this.renderBookmarkButton();
   }
 
   setState(data) {
@@ -480,6 +518,14 @@ class App {
       $menuButton.attr('aria-expanded', 'true');
       sublist.hidden = false;
     }
+  }
+
+  unsavePrompt() {
+    const { state, filteredPrompts } = this;
+    const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
+    this.savedPrompts = _.reject(this.savedPrompts, (p) => p.index === prompt.index);
+    StringUtil.saveToStorage('saved-prompts', this.savedPrompts);
+    this.renderBookmarkButton();
   }
 }
 
