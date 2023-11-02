@@ -102,6 +102,12 @@ class App {
     if (resetIndex) this.state.prompt = -1;
   }
 
+  static getPrompt(prompts, index) {
+    let prompt = _.findWhere(prompts, { index });
+    if (prompt === undefined) prompt = _.first(prompts);
+    return prompt;
+  }
+
   loadListeners() {
     $('.start').on('click', (e) => {
       $('.app').addClass('active');
@@ -129,7 +135,7 @@ class App {
     });
 
     window.addEventListener('popstate', (event) => {
-      console.log(event.state);
+      this.onPopState(event.state);
     });
   }
 
@@ -218,6 +224,13 @@ class App {
         });
       });
     }, 3000);
+  }
+
+  onPopState(state) {
+    this.setState(state);
+    this.filterPrompts(false);
+    this.renderFilters();
+    this.renderPrompt();
   }
 
   onPromptDataLoad(data) {
@@ -310,7 +323,7 @@ class App {
     const {
       documents, $documentModal, state, filteredPrompts,
     } = this;
-    const prompt = filteredPrompts[state.prompt];
+    const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
     const doc = documents[prompt.doc];
     const $document = $documentModal.find('#document-container');
     const $title = $documentModal.find('.resource-link');
@@ -364,15 +377,17 @@ class App {
   }
 
   renderNextPrompt() {
-    this.state.prompt += 1;
-    if (this.state.prompt >= this.filteredPrompts.length) this.state.prompt = 0;
+    const index = _.findIndex(this.filteredPrompts, (p) => p.index === this.state.prompt);
+    let newIndex = index + 1;
+    if (newIndex >= this.filteredPrompts.length) newIndex = 0;
+    this.state.prompt = this.filteredPrompts[newIndex].index;
     this.renderPrompt();
     this.pushState();
   }
 
   renderPrompt() {
-    const currentPromptIndex = this.state.prompt;
-    const prompt = this.filteredPrompts[currentPromptIndex];
+    const { state, filteredPrompts } = this;
+    const prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
     this.$prompt.html(`<p>${prompt.text}</p>`);
 
     let html = '';
@@ -390,7 +405,7 @@ class App {
         state.filters[name] = data[name];
       }
     });
-    if (_.has(data, 'prompt')) state.prompt = data.prompt;
+    if (_.has(data, 'prompt')) state.prompt = parseInt(data.prompt, 10);
     this.state = state;
   }
 
