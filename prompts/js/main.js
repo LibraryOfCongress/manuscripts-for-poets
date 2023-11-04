@@ -68,6 +68,15 @@ class App {
     });
   }
 
+  static closeMenus() {
+    const $buttons = $('.dropdown-selected');
+    $buttons.each((i, el) => {
+      const $el = $(el);
+      $el.attr('aria-expanded', 'false');
+      $(`#${$el.attr('aria-controls')}`)[0].hidden = true;
+    });
+  }
+
   downloadSavedPrompts() {
     const { savedPrompts } = this;
     if (savedPrompts.length <= 0) return;
@@ -144,7 +153,12 @@ class App {
     });
 
     $('.dropdown-selected').on('click', (e) => {
+      e.stopPropagation();
       this.constructor.toggleMenu($(e.currentTarget));
+    });
+
+    $('body').on('click', (e) => {
+      this.constructor.closeMenus();
     });
 
     $('.dropdown-list-item').on('click', (e) => {
