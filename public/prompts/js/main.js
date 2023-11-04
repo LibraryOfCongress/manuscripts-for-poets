@@ -3,7 +3,8 @@ class App {
     const defaults = {
       project: 'mary-church-terrell',
     };
-    this.options = _.extend({}, defaults, options);
+    this.qparams = StringUtil.queryParams();
+    this.options = _.extend({}, defaults, options, this.qparams);
     this.init();
   }
 
@@ -15,8 +16,7 @@ class App {
       },
       prompt: -1,
     };
-    const qparams = StringUtil.queryParams();
-    this.setState(qparams);
+    this.setState(this.qparams);
 
     this.$main = $('#main-content');
     this.$intro = $('#intro');
@@ -591,5 +591,5 @@ class App {
 }
 
 (function initApp() {
-  const app = new App({});
+  const app = new App(config);
 }());
