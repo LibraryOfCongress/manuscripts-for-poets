@@ -392,6 +392,12 @@ button.next-prompt {
   margin: 0;
   line-height: 1.33;
 }
+.meta button,
+.meta .button {
+  font-weight: normal;
+  line-height: 1.15;
+  margin-right: 6px;
+}
 
 .modal {
   position: absolute;

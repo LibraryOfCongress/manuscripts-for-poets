@@ -517,7 +517,7 @@ class App {
 
     html = '';
     html += '<h2>Mary Church Terrell Papers</h2>';
-    html += `<h3>${prompt.Item} <button class="show-doc">View in context</button></h3>`;
+    html += `<h3>${prompt.Item} <button class="show-doc">View context</button><a href="${prompt.itemUrl}" class="button" target="_blank">View on loc.gov</button></h3>`;
     this.$meta.html(html);
 
     this.renderDocument();
