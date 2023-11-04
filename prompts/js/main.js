@@ -315,12 +315,24 @@ class App {
   onPromptDataLoad(data) {
     console.log('Prompt data loaded.');
 
-    this.prompts = DataUtil.loadCollectionFromRows(data.prompts, (prompt) => {
-      const updatedPrompt = prompt;
+    this.prompts = DataUtil.loadCollectionFromRows(data.prompts, (p) => {
+      const updatedPrompt = p;
       // updatedPrompt.Project = prompt.Project.replace(/:.+/i, '');
-      updatedPrompt.itemUrl = `https://www.loc.gov/resource/${prompt.ResourceID}/?sp=${prompt.ItemAssetIndex}&st=text`;
+      updatedPrompt.itemUrl = `https://www.loc.gov/resource/${p.ResourceID}/?sp=${p.ItemAssetIndex}&st=text`;
+      updatedPrompt.EstimatedYear = p.EstimatedYear !== '' ? parseInt(p.EstimatedYear, 10) : '';
       return updatedPrompt;
     }, true);
+
+    // add years for those that don't have any
+    const firstValid = _.find(this.prompts, (p) => p.EstimatedYear !== '');
+    this.documents.forEach((doc, i) => {
+      if (doc.EstimatedYear !== '') return;
+      if (i === 0) this.documents[i].EstimatedYear = firstValid.EstimatedYear;
+      else {
+        this.documents[i].EstimatedYear = this.documents[i - 1].EstimatedYear;
+      }
+    });
+
     this.filterPrompts(false);
     this.timeRange = data.timeRange;
     this.subCollections = data.subCollections;
