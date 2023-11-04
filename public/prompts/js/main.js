@@ -18,6 +18,12 @@ class App {
     };
     this.setState(this.qparams);
 
+    // get project-specific options
+    const { project } = this.options;
+    if (_.has(this.options, project)) {
+      this.options = _.extend({}, this.options, this.options[project]);
+    }
+
     this.$main = $('#main-content');
     this.$intro = $('#intro');
     this.$prompt = $('#prompt-text');
@@ -220,6 +226,71 @@ class App {
     this.dataFilters = dataFilters;
   }
 
+  loadTimeline(timeline) {
+    // calculate time range
+    let [yearMin, yearMax] = this.timeRange;
+    let sortable = _.map(timeline, (entry) => {
+      const e = entry;
+      e.comparatorMin = _.has(entry, 'year') ? entry.year : entry.start;
+      e.comparatorMax = _.has(entry, 'year') ? entry.year : entry.end;
+      return e;
+    });
+    sortable = _.sortBy(timeline, (entry) => entry.comparatorMin);
+    if (sortable[0].comparatorMin < yearMin) yearMin = sortable[0].comparatorMin;
+    sortable = _.sortBy(timeline, (entry) => -entry.comparatorMax);
+    if (sortable[0].comparatorMax > yearMax) yearMax = sortable[0].comparatorMax;
+    const totalYears = yearMax - yearMin;
+    // put timeline into buckets
+    const buckets = [];
+    const minYears = 5;
+    timeline.forEach((t) => {
+      const tcopy = _.clone(t);
+      const start = _.has(t, 'year') ? t.year : t.start;
+      const end = _.has(t, 'year') || (t.end - t.start) < minYears ? start + minYears : t.end;
+      tcopy.tstart = start;
+      tcopy.tend = end;
+      let foundBucket = false;
+      let j = 0;
+      while (!foundBucket) {
+        if (j >= buckets.length) buckets.push([]);
+        const bucket = buckets[j];
+        let valid = true;
+        bucket.forEach((b) => {
+          if (start <= b.tend && end >= b.tstart) valid = false;
+        });
+        if (valid) {
+          foundBucket = true;
+          buckets[j].push(tcopy);
+          break;
+        }
+        j += 1;
+      }
+    });
+    // console.log(`Found ${buckets.length} buckets`);
+    // place the event html
+    const $timeline = $('#timeline');
+    let html = '';
+    const bucketHeight = 20;
+    buckets.forEach((bucket, i) => {
+      const bottom = bucketHeight * i;
+      bucket.forEach((event) => {
+        const left = MathUtil.norm(event.tstart, yearMin, yearMax) * 100;
+        const width = _.has(event, 'year') ? `${bucketHeight}px` : `${((event.end - event.start) / totalYears) * 100}%`;
+        html += `<div class="event" style="bottom: ${bottom}px; left: ${left}%; width: ${width}">`;
+        html += `<div class="event-text">${event.text}</div>`;
+        html += '</div>';
+      });
+    });
+    // place the prompt html
+    this.prompts.forEach((prompt) => {
+      const left = MathUtil.norm(prompt.EstimatedYear, yearMin, yearMax) * 100;
+      html += `<div class="prompt-event" style="left: ${left}%;" data-index="${prompt.index}">`;
+      html += '<div class="prompt-event-text">You are approximately here</div>';
+      html += '</div>';
+    });
+    $timeline.html(html);
+  }
+
   onFilter($selectButton) {
     this.constructor.renderFilterSelect($selectButton);
     const name = $selectButton.attr('data-name');
@@ -336,6 +407,10 @@ class App {
     this.filterPrompts(false);
     this.timeRange = data.timeRange;
     this.subCollections = data.subCollections;
+
+    if (_.has(this.options, 'timeline')) {
+      this.loadTimeline(this.options.timeline);
+    }
 
     // this.printBuckets();
 
