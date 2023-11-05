@@ -428,6 +428,8 @@ button.next-prompt {
   display: flex;
   overflow: hidden;
   position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.333);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.333);
 }
 .modal .document .pane {
   flex-basis: 50%;
@@ -441,6 +443,8 @@ button.next-prompt {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  display: block;
+  border-left: 2px solid black;
 }
 .modal .document .transcript {
   font-family: 'Courier New', Courier, monospace;
@@ -453,11 +457,11 @@ button.next-prompt {
   font-size: 1rem;
 }
 .modal .buttons {
-  flex-basis: 60px;
+  flex-basis: 44px;
   flex-grow: 0;
   flex-shrink: 0;
   box-sizing: border-box;
-  padding: 12px;
+  padding: 0 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -480,6 +484,84 @@ button.next-prompt {
   text-align: center;
   margin: 0;
 }
+.timeline-container {
+  overflow: hidden;
+  overflow-x: auto;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+.timeline {
+  width: 8000px;
+  background: rgb(34, 27, 19);
+  position: relative;
+  padding-top: 20px;
+}
+.year-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.year-marker .year {
+  width: 100px;
+  text-align: center;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+  top: 0;
+  left: 50%;
+  margin-left: -50px;
+  background: rgb(34, 27, 19);
+}
+.event {
+  position: absolute;
+  height: 16px;
+  line-height: 16px;
+  text-indent: 18px;
+  border-radius: 10px;
+  white-space: nowrap;
+  background: rgb(110, 83, 45);
+  color: white;
+  font-size: 9px;
+  box-sizing: border-box;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}
+.event:nth-child(5n + 1) {
+  background: rgb(117, 105, 46);
+}
+.event:nth-child(5n + 2) {
+  background: rgb(117, 76, 46);
+}
+.event:nth-child(5n + 3) {
+  background: rgb(87, 55, 85);
+}
+.event:nth-child(5n + 4) {
+  background: rgb(83, 41, 43);
+}
+.event-date {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+}
+.prompt-event {
+  display: none;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: rgba(224, 39, 70, 0.333);
+}
+.prompt-event.active {
+  display: block;
+}
+.prompt-event .prompt-event-text {
+  font-size: 10px;
+  color: rgba(224, 39, 70, 0.8);
+  position: absolute;
+  top: 2px;
+  left: 8px;
+  white-space: nowrap;
+}
 
 .saved-prompts-container {
   overflow: hidden;
@@ -498,6 +580,10 @@ button.next-prompt {
 .saved-prompt .text {
   flex-grow: 1;
   font-family: 'Courier New', Courier, monospace;
+}
+.saved-prompt button,
+.saved-prompt .button {
+  white-space: nowrap;
 }
 button.download-saved-prompts {
   display: flex;
