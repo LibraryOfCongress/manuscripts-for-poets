@@ -2,13 +2,13 @@ const config = {
   'mary-church-terrell': {
     timeline: [
       {
-        year: 1863, title: 'Born, Memphis, Tenn.', description: '',
+        year: 1863, text: 'Born, Memphis, Tenn.', description: '',
       }, {
-        start: 1863, end: 1877, title: 'Reconstruction Period', description: '', type: 'era',
+        start: 1863, end: 1877, text: 'Reconstruction Period', description: '', type: 'era',
       }, {
-        start: 1877, end: 1950, title: 'Nadir Period', description: '', type: 'era',
+        start: 1877, end: 1950, text: 'Nadir Period', description: '', type: 'era',
       }, {
-        start: 1880, end: 1949, title: 'Jim Crow Era', description: '', type: 'era',
+        start: 1880, end: 1949, text: 'Jim Crow Era', description: '', type: 'era',
       }, {
         start: 1885, end: 1887, text: 'Taught at Wilberforce University', description: '',
       }, {
@@ -40,7 +40,7 @@ const config = {
       }, {
         year: 1920, text: 'Appointed supervisor, Committee for Eastern District Work among Colored Women, Republican National Committee', description: '',
       }, {
-        start: 1929, end: 1939, title: 'The Great Depression', description: '', type: 'era',
+        start: 1929, end: 1939, text: 'The Great Depression', description: '', type: 'era',
       }, {
         start: 1929, end: 1930, text: 'Campaigned for Ruth Hanna McCormick, Republican candidate for U.S. Senate from Illinois', description: '',
       }, {
@@ -52,9 +52,9 @@ const config = {
       }, {
         year: 1949, text: 'Elected chairman, Coordinating Committee for the Enforcement of the D.C. Anti-Discrimination Laws', description: '',
       }, {
-        year: 1954, title: 'Died, Annapolis, Md.',
+        year: 1954, text: 'Died, Annapolis, Md.',
       }, {
-        start: 1954, end: 1968, title: 'Civil Rights Movement', description: '', type: 'era',
+        start: 1954, end: 1968, text: 'Civil Rights Movement', description: '', type: 'era',
       },
     ],
   },

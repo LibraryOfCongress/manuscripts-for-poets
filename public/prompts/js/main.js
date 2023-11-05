@@ -31,6 +31,8 @@ class App {
     this.$documentModal = $('#document-browser');
     this.$statePrev = $('.state-prev');
     this.$stateNext = $('.state-next');
+    this.$timeline = $('#timeline');
+    this.$timelineContainer = $('#timeline-container');
 
     this.stateHistory = [];
     this.stateIndex = -1;
@@ -226,71 +228,6 @@ class App {
     this.dataFilters = dataFilters;
   }
 
-  loadTimeline(timeline) {
-    // calculate time range
-    let [yearMin, yearMax] = this.timeRange;
-    let sortable = _.map(timeline, (entry) => {
-      const e = entry;
-      e.comparatorMin = _.has(entry, 'year') ? entry.year : entry.start;
-      e.comparatorMax = _.has(entry, 'year') ? entry.year : entry.end;
-      return e;
-    });
-    sortable = _.sortBy(timeline, (entry) => entry.comparatorMin);
-    if (sortable[0].comparatorMin < yearMin) yearMin = sortable[0].comparatorMin;
-    sortable = _.sortBy(timeline, (entry) => -entry.comparatorMax);
-    if (sortable[0].comparatorMax > yearMax) yearMax = sortable[0].comparatorMax;
-    const totalYears = yearMax - yearMin;
-    // put timeline into buckets
-    const buckets = [];
-    const minYears = 5;
-    timeline.forEach((t) => {
-      const tcopy = _.clone(t);
-      const start = _.has(t, 'year') ? t.year : t.start;
-      const end = _.has(t, 'year') || (t.end - t.start) < minYears ? start + minYears : t.end;
-      tcopy.tstart = start;
-      tcopy.tend = end;
-      let foundBucket = false;
-      let j = 0;
-      while (!foundBucket) {
-        if (j >= buckets.length) buckets.push([]);
-        const bucket = buckets[j];
-        let valid = true;
-        bucket.forEach((b) => {
-          if (start <= b.tend && end >= b.tstart) valid = false;
-        });
-        if (valid) {
-          foundBucket = true;
-          buckets[j].push(tcopy);
-          break;
-        }
-        j += 1;
-      }
-    });
-    // console.log(`Found ${buckets.length} buckets`);
-    // place the event html
-    const $timeline = $('#timeline');
-    let html = '';
-    const bucketHeight = 20;
-    buckets.forEach((bucket, i) => {
-      const bottom = bucketHeight * i;
-      bucket.forEach((event) => {
-        const left = MathUtil.norm(event.tstart, yearMin, yearMax) * 100;
-        const width = _.has(event, 'year') ? `${bucketHeight}px` : `${((event.end - event.start) / totalYears) * 100}%`;
-        html += `<div class="event" style="bottom: ${bottom}px; left: ${left}%; width: ${width}">`;
-        html += `<div class="event-text">${event.text}</div>`;
-        html += '</div>';
-      });
-    });
-    // place the prompt html
-    this.prompts.forEach((prompt) => {
-      const left = MathUtil.norm(prompt.EstimatedYear, yearMin, yearMax) * 100;
-      html += `<div class="prompt-event" style="left: ${left}%;" data-index="${prompt.index}">`;
-      html += '<div class="prompt-event-text">You are approximately here</div>';
-      html += '</div>';
-    });
-    $timeline.html(html);
-  }
-
   onFilter($selectButton) {
     this.constructor.renderFilterSelect($selectButton);
     const name = $selectButton.attr('data-name');
@@ -396,11 +333,11 @@ class App {
 
     // add years for those that don't have any
     const firstValid = _.find(this.prompts, (p) => p.EstimatedYear !== '');
-    this.documents.forEach((doc, i) => {
-      if (doc.EstimatedYear !== '') return;
-      if (i === 0) this.documents[i].EstimatedYear = firstValid.EstimatedYear;
+    this.prompts.forEach((prompt, i) => {
+      if (prompt.EstimatedYear !== '') return;
+      if (i === 0) this.prompts[i].EstimatedYear = firstValid.EstimatedYear;
       else {
-        this.documents[i].EstimatedYear = this.documents[i - 1].EstimatedYear;
+        this.prompts[i].EstimatedYear = this.prompts[i - 1].EstimatedYear;
       }
     });
 
@@ -409,7 +346,7 @@ class App {
     this.subCollections = data.subCollections;
 
     if (_.has(this.options, 'timeline')) {
-      this.loadTimeline(this.options.timeline);
+      this.renderTimeline(this.options.timeline);
     }
 
     // this.printBuckets();
@@ -523,13 +460,17 @@ class App {
     const matchText = text.replace(prompt.text, `</span><strong>${prompt.text}</strong><span>`);
     let html = '';
     html += `<div id="transcript-pane" class="pane transcript"><p><span>${matchText}</span></p></div>`;
-    html += `<div class="pane image" style="background-image: url(${doc.DownloadUrl})"></div>`;
+    html += `<a href="${prompt.itemUrl}" target="_blank" class="pane image" style="background-image: url(${doc.DownloadUrl})"><span class="visually-hidden">View this on the Library of Congress website</span></a>`;
     $document.html(html);
     $title.text(doc.Item);
     $title.attr('href', doc.itemUrl);
+    $('.prompt-event').removeClass('active');
+    const $eventMarker = $(`.prompt-event[data-index="${prompt.index}"]`).first();
+    $eventMarker.addClass('active');
     // this.constructor.preloadImage(doc.DownloadUrl);
     // check if highligthed text is visible
     setTimeout(() => {
+      // scroll the transcript pane
       const $pane = $('#transcript-pane');
       const $highlighted = $pane.find('strong').first();
       if ($highlighted.length > 0) {
@@ -547,6 +488,24 @@ class App {
             $pane.scrollTop(pScrollTop);
           }
         }
+      }
+      // scroll the timeline
+      const { $timelineContainer, $timeline } = this;
+      const cWidth = $timelineContainer.width();
+      const markerX = $eventMarker.position().left;
+      const thresholdLeft = cWidth * 0.6;
+      const targetLeft = cWidth * 0.45;
+      if (markerX > thresholdLeft) {
+        const tWidth = $timeline.width();
+        const maxLeft = tWidth - cWidth;
+        const cScrollLeft = Math.min(markerX - targetLeft, maxLeft);
+        if (cScrollLeft > 0) {
+          $timelineContainer.scrollLeft(cScrollLeft);
+        } else {
+          $timelineContainer.scrollLeft(0);
+        }
+      } else {
+        $timelineContainer.scrollLeft(0);
       }
     }, 100);
   }
@@ -634,6 +593,88 @@ class App {
     else this.$stateNext.addClass('active');
     if (stateIndex <= 0) this.$statePrev.removeClass('active');
     else this.$statePrev.addClass('active');
+  }
+
+  renderTimeline(timeline) {
+    // calculate time range
+    let [yearMin, yearMax] = this.timeRange;
+    let sortable = _.map(timeline, (entry) => {
+      const e = entry;
+      e.comparatorMin = _.has(entry, 'year') ? entry.year : entry.start;
+      e.comparatorMax = _.has(entry, 'year') ? entry.year : entry.end;
+      return e;
+    });
+    sortable = _.sortBy(timeline, (entry) => entry.comparatorMin);
+    if (sortable[0].comparatorMin < yearMin) yearMin = sortable[0].comparatorMin;
+    sortable = _.sortBy(timeline, (entry) => -entry.comparatorMax);
+    if (sortable[0].comparatorMax > yearMax) yearMax = sortable[0].comparatorMax;
+    const totalYears = yearMax - yearMin;
+    // put timeline into buckets
+    const buckets = [];
+    const minYears = 4;
+    timeline.forEach((t) => {
+      const tcopy = _.clone(t);
+      const start = _.has(t, 'year') ? t.year : t.start;
+      const end = _.has(t, 'year') || (t.end - t.start) < minYears ? start + minYears : t.end;
+      tcopy.tstart = start;
+      tcopy.tend = end;
+      let foundBucket = false;
+      let j = 0;
+      while (!foundBucket) {
+        if (j >= buckets.length) buckets.push([]);
+        const bucket = buckets[j];
+        let valid = true;
+        bucket.forEach((b) => {
+          if (start <= b.tend && end >= b.tstart) valid = false;
+        });
+        if (valid) {
+          foundBucket = true;
+          buckets[j].push(tcopy);
+          break;
+        }
+        j += 1;
+      }
+    });
+    console.log(`Found ${buckets.length} buckets`);
+    const $timeline = $('#timeline');
+    let html = '';
+    // place year markers
+    html += '<div class="year-markers">';
+    const labelEvery = 5;
+    _.range(yearMin, yearMax + 1).forEach((year) => {
+      const x = MathUtil.norm(year, yearMin, yearMax) * 100;
+      html += `<div class="year-marker" style="left: ${x}%">`;
+      if (year % labelEvery === 0) html += `<div class="year">${year}</div>`;
+      html += '</div>';
+    });
+    html += '</div>';
+    // place the event html
+    const bucketHeight = 16;
+    $timeline.css('height', `${bucketHeight * buckets.length}px`);
+    html += '<div class="events">';
+    buckets.forEach((bucket, i) => {
+      const bottom = bucketHeight * i;
+      bucket.forEach((event) => {
+        const left = MathUtil.norm(event.tstart, yearMin, yearMax) * 100;
+        const width = _.has(event, 'year') ? `${bucketHeight}px` : `${((event.end - event.start) / totalYears) * 100}%`;
+        const dateText = _.has(event, 'year') ? event.year : `${event.start}-${event.end}`;
+        html += `<div class="event" style="bottom: ${bottom}px; left: ${left}%; width: ${width}">`;
+        html += `<div class="event-text"><span class="event-date">${dateText}</span> - ${event.text}</div>`;
+        html += '</div>';
+      });
+    });
+    html += '</div>';
+    html += '<div class="prompt-events">';
+    // place the prompt html
+    this.prompts.forEach((prompt) => {
+      const left = MathUtil.norm(prompt.EstimatedYear, yearMin, yearMax) * 100;
+      html += `<div class="prompt-event" style="left: ${left}%;" data-index="${prompt.index}">`;
+      html += '<div class="prompt-event-text">You are approximately here</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    $timeline.html(html);
+    $timeline.closest('.timeline-container').css('flex-basis', `${bucketHeight * buckets.lengt}px`);
   }
 
   savePrompt() {
