@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>By The People manuscript collection prompt interface</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <link rel="stylesheet" href="../shared/css/vendor/normalize.css">
+  <link rel="stylesheet" href="../shared/css/app.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+
+  <!-- LoC banner starts here -->
+  <header class="loc-header">
+      <div class="loc-logo">
+          <a href="https://www.loc.gov/"><img src="../shared/img/LOC_Logo_horiz_inv.png" alt="The Library of Congress logo" title="Go to the Library of Congress homepage" /></a>
+      </div>
+      <div class="project-description">
+          <p>This is a project explores new ways of engaging with <a href="https://www.loc.gov/item/2021387726/">the transcript data</a> of the <a href="https://www.loc.gov/collections/mary-church-terrell-papers/about-this-collection/">Mary Church Terrell Papers</a> at the <a href="https://www.loc.gov/">Library of Congress</a>. <a href="index.html" class="button small">View project</a> <a href="https://github.com/libraryOfCongress/loc-transcript-lab" class="button small">View the code</a></p>
+      </div>
+  </header>
+  <!-- /LoC banner end here -->
+
+  <!-- Your code starts here -->
+  <main id="main-content" class="main-content statement">
+    <h1><em>At The Table</em> Artist Statement &amp; Methodology</h1>
+    <p><a href="https://guides.loc.gov/mary-church-terrell">Mary Church Terrell (1863-1954)</a> was above all an “unceasing militant” (<a href="https://lccn.loc.gov/2020024350">Parker 2020</a>) advocating for the Black woman who chose to fervently resist the forces that tried to quiet her voice. It is from this complex legacy of both her public and private life that the interactive art project <em>At The Table With: Mary Church Terrell</em> was formed by the Library of Congress's <a href="https://www.loc.gov/programs/of-the-people/represent/connecting-communities-digital-initiative/">Connecting Communities Digital Initiative (CCDI)</a> and its 2023 <a href="https://www.loc.gov/programs/of-the-people/learn/archives-history-and-heritage-advanced-internship/">AHHA interns</a> to reimagined ways of interacting the <a href="https://www.loc.gov/collections/mary-church-terrell-papers/about-this-collection/">Mary Church Terrell Papers</a> not as a static collection of documents and images, but a vibrant repository of information on a person with tenacity and zeal to confront the inequities of the world around her.</p>
+
+    <p>During the formation of the interface, while we sought to create an engaging product for the general public, we also had particular audiences in mind. Given Terrell's life experiences, we focused on the usefulness of the interface and its generative process for Black creatives, educators, students, writers and poets especially. A collection like Terrell's at the Library is unique for many reasons, among them being its focus solely on a Black woman who was a Women's rights activist, orator and educator and co-founder of prominent Black Civil rights organizations in the U.S.</p>
+
+    <p>The creative and technical process behind the interface is driven by the use of natural language process (NLP) software to generate prompts from the full texts of MCT’s poems, essays, speech and correspondences in English. <a href="https://github.com/libraryOfCongress/loc-transcript-lab">Custom and open-source code</a> was written to analyze the sentence structure of these texts to identify and extract what we considered "creative prompts" such as questions, directives, and instructions that could be "spoken" directly to users of the interface. Since this was an automated process, the results are not perfect and may lead to sometimes jarring, peculiar, or humorous excerpts from the collection.</p>
+
+    <p>Also, we acknowledge the need for sensitivity around some of the word choices Terrell. Terrell was as a product of her time and place in the world as a well off socially influential Light-skinned Black Woman in the late 19th and mid 20th centuries. She would have used words to describe certain events that may be jarring to contemporary readers. Terrell lived through great changes, stretching from the period of the U.S. Post-Civil War Reconstruction and the ending of legalized racial segregation in US education in the 1950’s.</p>
+
+    <p>We hope that with your experience with <em>At The Table With: Mary Church Terrell</em> you learn not only about the life of Terrell but also learn vital and innovative ways of addressing the issues of this particular historical moment. We hope to leave you with a renewed sense of the possibilities of words and their power to create effective change. We hope you too will become an “unceasing militant” as exemplified by Mary Church Terrell.</p>
+  </main>
+  <!-- /Your code end here -->
+
+  <!-- LoC footer starts here -->
+  <footer class="loc-footer">
+      <p>This is a project explores new ways of engaging with <a href="https://www.loc.gov/item/2021387726/">the transcript data</a> of the <a href="https://www.loc.gov/collections/mary-church-terrell-papers/about-this-collection/">Mary Church Terrell Papers</a> at the <a href="https://www.loc.gov/">Library of Congress</a></p>
+      <ul class="loc-footer-nav-list" role="navigation">
+          <li><a href="https://github.com/libraryOfCongress/loc-transcript-lab">Source code</a></li>  
+          <li><a href="https://www.loc.gov/">The Library of Congress</a></li>
+          <li><a href="https://loc.gov/legal">Privacy Policy</a>.</li>
+          <li><a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement">Github Privacy Statement</a>.</li>
+          <li><a href="https://creativecommons.org/publicdomain/zero/1.0/">License</a></li>
+          <li><a href="mailto:ccdi@loc.gov">Contact</a></li>
+      </ul>
+  </footer>
+  <!-- /LoC footer end here -->
+
+  <script src="../shared/js/vendor/jquery-3.7.0.min.js"></script>  
+  <script src="../shared/js/vendor/underscore-umd-1.13.6.min.js"></script>
+
+  <script src="../shared/js/lib/DataUtil.js"></script>
+  <script src="../shared/js/lib/MathUtil.js"></script>
+  <script src="../shared/js/lib/StringUtil.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
