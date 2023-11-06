@@ -517,7 +517,6 @@ button.next-prompt {
   position: absolute;
   height: 16px;
   line-height: 16px;
-  text-indent: 18px;
   border-radius: 10px;
   white-space: nowrap;
   background: rgb(110, 83, 45);
@@ -538,6 +537,13 @@ button.next-prompt {
 }
 .event:nth-child(5n + 4) {
   background: rgb(83, 41, 43);
+}
+.event-text {
+  position: absolute;
+  height: 16px;
+  line-height: 16px;
+  left: 18px;
+  top: 0;
 }
 .event-date {
   font-weight: bold;

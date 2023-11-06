@@ -651,15 +651,25 @@ class App {
     // place the event html
     const bucketHeight = 16;
     $timeline.css('height', `${bucketHeight * buckets.length}px`);
+    const timelineWidth = $timeline.width();
     html += '<div class="events">';
     buckets.forEach((bucket, i) => {
       const bottom = bucketHeight * i;
       bucket.forEach((event) => {
         const left = MathUtil.norm(event.tstart, yearMin, yearMax) * 100;
-        const width = _.has(event, 'year') ? `${bucketHeight}px` : `${((event.end - event.start) / totalYears) * 100}%`;
+        const eventDur = event.end - event.start;
+        const width = _.has(event, 'year') ? `${bucketHeight}px` : `${(eventDur / totalYears) * 100}%`;
         const dateText = _.has(event, 'year') ? event.year : `${event.start}-${event.end}`;
         html += `<div class="event" style="bottom: ${bottom}px; left: ${left}%; width: ${width}">`;
         html += `<div class="event-text"><span class="event-date">${dateText}</span> - ${event.text}</div>`;
+        // draw additional text labels for long events
+        if (eventDur > (labelEvery * 2)) {
+          const additionalLabelCount = Math.floor(eventDur / labelEvery);
+          _.range(1, additionalLabelCount + 1).forEach((j) => {
+            const jLeft = j * (labelEvery / totalYears) * timelineWidth;
+            html += `<div class="event-text" style="left: ${jLeft}px"><span class="event-date">${dateText}</span> - ${event.text}</div>`;
+          });
+        }
         html += '</div>';
       });
     });
