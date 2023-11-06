@@ -39,12 +39,20 @@ body {
   color:rgb(254, 218, 173);
 }
 
+.main-content.statement {
+  max-width: 960px;
+  box-sizing: border-box;
+  padding: 30px 60px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+}
+
 .app {
   position: relative;
   display: flex;
   align-items: stretch;
   width: 100%;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 60px);
   flex-direction: column;
   overflow: hidden;
 }
@@ -74,9 +82,13 @@ body {
   max-width: 640px;
   letter-spacing: 1px;
 }
-.intro button {
+.intro button,
+.intro .button {
   padding: 0.6rem 1rem;
   font-size: 1.4rem;
+  line-height: 1;
+  color: white;
+  margin-right: 0.5rem;
 }
 .intro .loading {
   display: none;
