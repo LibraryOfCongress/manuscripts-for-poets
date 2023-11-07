@@ -47,6 +47,31 @@ body {
   font-size: 1.1rem;
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.loader {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -50px;
+  background: 50% 50% url(../img/mct-document.jpg) no-repeat;
+  background-size: contain;
+  animation: spin 2s linear infinite;
+  display: none;
+}
+.is-loading .loader {
+  display: block;
+}
+
 .app {
   position: relative;
   display: flex;
