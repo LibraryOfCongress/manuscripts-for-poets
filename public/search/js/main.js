@@ -42,7 +42,9 @@ class App {
 
   indexTranscriptData(documents) {
     this.loadingOn('Data parsed; indexing transcript data...');
-    const index = new FlexSearch.Index();
+    const index = new FlexSearch.Index({
+      tokenize: 'forward',
+    });
     // console.log(documents);
     documents.forEach((document) => {
       index.add(document.id, document.Transcription);
