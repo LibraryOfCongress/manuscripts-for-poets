@@ -659,9 +659,10 @@ class App {
         const left = MathUtil.norm(event.tstart, yearMin, yearMax) * 100;
         const eventDur = event.end - event.start;
         const width = _.has(event, 'year') ? `${bucketHeight}px` : `${(eventDur / totalYears) * 100}%`;
+        const eventType = _.has(event, 'type') ? event.type : '';
         const description = _.has(event, 'description') && event.description.length > 0 ? ` title="${event.description}"` : '';
         const dateText = _.has(event, 'year') ? event.year : `${event.start}-${event.end}`;
-        html += `<div class="event" style="bottom: ${bottom}px; left: ${left}%; width: ${width}" ${description}>`;
+        html += `<div class="event ${eventType}" style="bottom: ${bottom}px; left: ${left}%; width: ${width}" ${description}>`;
         html += `<div class="event-text"><span class="event-date">${dateText}</span> - ${event.text}</div>`;
         // draw additional text labels for long events
         if (eventDur > (labelEvery * 2)) {

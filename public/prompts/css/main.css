@@ -563,16 +563,10 @@ button.next-prompt {
   border-top: 1px solid black;
   border-bottom: 1px solid black;
 }
-.event:nth-child(5n + 1) {
-  background: rgb(117, 105, 46);
-}
-.event:nth-child(5n + 2) {
-  background: rgb(117, 76, 46);
-}
-.event:nth-child(5n + 3) {
+.event.era {
   background: rgb(87, 55, 85);
 }
-.event:nth-child(5n + 4) {
+.event.bill {
   background: rgb(83, 41, 43);
 }
 .event-text {
