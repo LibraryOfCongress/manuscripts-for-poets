@@ -681,7 +681,10 @@ class App {
     this.prompts.forEach((prompt) => {
       const left = MathUtil.norm(prompt.EstimatedYear, yearMin, yearMax) * 100;
       html += `<div class="prompt-event" style="left: ${left}%;" data-index="${prompt.index}">`;
-      html += '<div class="prompt-event-text">You are approximately here</div>';
+      html += '<div class="prompt-event-text">';
+      html += `<div>You are approximately here in ${prompt.EstimatedYear}</div>`;
+      html += `<div>Terrell would be about ${prompt.EstimatedYear - yearMin} years old</div>`;
+      html += '</div>';
       html += '</div>';
     });
     html += '</div>';
