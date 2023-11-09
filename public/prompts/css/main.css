@@ -47,6 +47,14 @@ body {
   font-size: 1.1rem;
 }
 
+.breadcrumbs .separator {
+  margin: 0 1rem;
+}
+.main-content.statement .button {
+  font-size: 2rem;
+  padding: 1rem 2rem;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
