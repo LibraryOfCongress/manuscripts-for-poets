@@ -357,6 +357,9 @@ button.next-prompt {
   max-width: 800px;
   position: relative;
 }
+.prompt-text .prompt-inner-text {
+  cursor: pointer;
+}
 .prompt-actions {
   white-space: nowrap;
   display: flex;
