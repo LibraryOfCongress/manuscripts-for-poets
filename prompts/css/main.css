@@ -605,6 +605,8 @@ button.next-prompt {
   position: absolute;
   top: 2px;
   left: 8px;
+}
+.prompt-event .prompt-event-text div {
   white-space: nowrap;
 }
 
