@@ -542,7 +542,7 @@ class App {
     const isSaved = _.find(savedPrompts, (p) => p.index === prompt.index);
     let html = '';
     html += '<p>';
-    html += prompt.text;
+    html += `<span class="prompt-inner-text show-doc">${prompt.text}</span>`;
     html += '<span class="prompt-actions">';
     html += '<button class="show-doc" title="View in context">';
     html += '<span class="visually-hidden">View in context</span>';
