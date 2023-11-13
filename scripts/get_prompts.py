@@ -17,7 +17,7 @@ def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", dest="INPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_with-dates.csv", help="A BtP dataset file. You can download these via script `get_transcript_data.py`")
     parser.add_argument("-filter", dest="FILTER", default="lang=en AND Project IN LIST Family letters|Speeches and writings|Diaries and journals: 1888-1951", help="Filter query string; leave blank if no filter")
-    parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20.csv", help="Output csv file")
+    parser.add_argument("-out", dest="OUTPUT_FILE", default="data/output/mary-church-terrell-advocate-for-african-americans-and-women_2023-01-20_prompts.csv", help="Output csv file")
     parser.add_argument("-debug", dest="DEBUG", action="store_true", help="Debug?")
     args = parser.parse_args()
     return args

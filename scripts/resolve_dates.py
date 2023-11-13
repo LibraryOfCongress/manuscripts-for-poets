@@ -4,6 +4,8 @@
 
 import argparse
 import dateparser
+import datetime
+import re
 
 from utilities import *
 
@@ -66,12 +68,38 @@ def main(a):
         estimatedDateEnd = None
         estimatedDateConfidence = 0
 
+        # Exact year is already set in data
         if dateIsDay:
             estimatedDateStart = startDate
             estimatedDateEnd = endDate
             estimatedDateConfidence = 99
 
-        else:
+        # Check to see if it's in the title
+        if estimatedDateStart is None or estimatedDateEnd is None:
+            title = row["Item"]
+            # check for circa specific year, e.g. circa 1903
+            pattern = re.compile(r".*circa (1[0-9][0-9][0-9]) .*")
+            matches = pattern.match(title)
+            if matches:
+                estimatedDateStart = datetime.datetime(int(matches.group(1)), 1, 1)
+                estimatedDateEnd = datetime.datetime(int(matches.group(1))+1, 1, 1)
+                estimatedDateConfidence = 80
+                dateIsDay = True
+
+            # check for circa specific range, e.g. circa 1880-1884
+            else:
+                pattern = re.compile(r".*circa (1[0-9][0-9][0-9])\-(1[0-9][0-9][0-9]).*")
+                matches = pattern.match(title)
+                if matches:
+                    startDate = datetime.datetime(int(matches.group(1)), 1, 1)
+                    endDate = datetime.datetime(int(matches.group(2)), 1, 1)
+                    deltaDays = (endDate - startDate).days
+                    dateIsDay = 0 < deltaDays < 2
+                    dateIsWithinYear = 1 < deltaDays < 365
+                    dateIsYear = 365 <= deltaDays <= 366
+                    dateIsYearRange = deltaDays > 366
+            
+        if not dateIsDay:
             transcriptDate = None
             transcriptDates = [dateparser.parse(d, settings={'REQUIRE_PARTS': ['year'], 'PREFER_DAY_OF_MONTH': 'first'}) for d in row["TranscriptDates"].split(" | ")]
             if len(transcriptDates) > 0:
@@ -123,7 +151,10 @@ def main(a):
         rows[i]["EstimatedDateConfidence"] = estimatedDateConfidence
 
         deltaDays = (estimatedDateEnd - estimatedDateStart).days
-        rows[i]["EstimatedYear"] = estimatedDateStart.year if deltaDays < (365 * 1.5) else ""
+        # If range under 10 years, take the middle
+        if deltaDays < (365 * 10):
+            deltaYears = 0.5 * (estimatedDateEnd.year - estimatedDateStart.year)
+            rows[i]["EstimatedYear"] = estimatedDateStart.year + int(deltaYears)
         
         printProgress(i+1, rowCount, "Progress: ")
 
