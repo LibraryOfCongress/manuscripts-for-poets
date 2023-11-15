@@ -13,7 +13,7 @@ class StringUtil {
   }
 
   static getHighlightedText(text, textToHighlight, wordsBeforeCount = -1, wordsAfterCount = -1) {
-    const regex = new RegExp(textToHighlight.split(/\s+/).filter((i) => i?.length).join('|'), 'gi');
+    const regex = new RegExp(textToHighlight.replace(/\s+/g, ' '), 'gi');
     const textNormalized = text.replace(/\s+/g, ' ');
     const result = textNormalized.replace(regex, (match) => `<strong>${match}</strong>`);
     const resultNormalized = result.replaceAll(/<\/strong>\s*<strong>/gi, ' ');
