@@ -42,10 +42,14 @@ def main(a):
     # Filter data if necessary
     if len(a.FILTER) > 0:
         rows = filterByQueryString(rows, a.FILTER)
+        rowCount = len(rows)
     
     prevResourceId = None
     prevEstimatedDateStart = None
     prevEstimatedDateEnd = None
+    datesFromMetadataUsed = 0
+    datesFromTranscriptsUsed = 0
+    estimatedDatesUsed = 0
 
     # Retrieve resource data for each row
     for i, row in enumerate(rows):
@@ -73,6 +77,7 @@ def main(a):
             estimatedDateStart = startDate
             estimatedDateEnd = endDate
             estimatedDateConfidence = 99
+            datesFromMetadataUsed += 1
 
         # Check to see if it's in the title
         if estimatedDateStart is None or estimatedDateEnd is None:
@@ -85,6 +90,7 @@ def main(a):
                 estimatedDateEnd = datetime.datetime(int(matches.group(1))+1, 1, 1)
                 estimatedDateConfidence = 80
                 dateIsDay = True
+                datesFromMetadataUsed += 1
 
             # check for circa specific range, e.g. circa 1880-1884
             else:
@@ -131,11 +137,14 @@ def main(a):
                     estimatedDateEnd = datetime.datetime(transcriptDate.year + 1, transcriptDate.month, transcriptDate.day)
                     estimatedDateConfidence = 50
 
+                datesFromTranscriptsUsed += 1
+
             # if date range is greater than a year and not first in sequence, inheret the previous date
             elif (startDate is None or endDate is None or dateIsYearRange) and not firstInSequence:
                 estimatedDateStart = prevEstimatedDateStart
                 estimatedDateEnd = prevEstimatedDateEnd
                 estimatedDateConfidence = 25
+                estimatedDatesUsed += 1
 
             # No date is available, defer to metadata date
             elif startDate is not None or endDate is not None:
@@ -159,6 +168,10 @@ def main(a):
         printProgress(i+1, rowCount, "Progress: ")
 
     if a.PROBE:
+        print(f"{datesFromMetadataUsed} dates from metadata used ({1.0*datesFromMetadataUsed/rowCount*100}% of total)")
+        print(f"{datesFromTranscriptsUsed} dates from transcripts used ({1.0*datesFromTranscriptsUsed/rowCount*100}% of total)")
+        print(f"{datesFromTranscriptsUsed+estimatedDatesUsed} dates used if we use proximity estimation ({1.0*(datesFromTranscriptsUsed+estimatedDatesUsed)/rowCount*100}% of total)")
+        
         return
 
     # Add fields to new data
