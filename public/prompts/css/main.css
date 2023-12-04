@@ -10,6 +10,14 @@
 body {
   background: black;
 }
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #ffdb3d;
+}
+footer button:focus-visible,
+footer a:focus-visible {
+  outline: 2px solid black;
+}
 .main-content {
   background-color: rgb(40, 31, 18);
   color: var(--text-base-lightest);
@@ -82,7 +90,7 @@ body {
 
 .app {
   position: relative;
-  display: flex;
+  display: none;
   align-items: stretch;
   width: 100%;
   height: calc(100vh - 60px);
@@ -99,20 +107,20 @@ body {
   flex-direction: column;
   justify-content: center;
   padding: 40px;
+  max-width: 720px;
   box-sizing: border-box;
   opacity: 0;
 }
 .intro h1 {
   letter-spacing: 2px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-size: 1.8rem;
 }
 .intro h1 .names {
   color: rgb(243, 188, 121);
 }
 .intro p {
   margin: 0 0 0.8rem;
-  width: 80%;
-  max-width: 640px;
   letter-spacing: 1px;
 }
 .intro button,
@@ -141,10 +149,16 @@ body {
   opacity: 0;
   transition: opacity 1s ease-in-out;
 }
+.app.active {
+  display: flex;
+}
 .intro.active,
 .app.active {
   opacity: 1;
   z-index: 10;
+}
+.intro.inactive {
+  display: none;
 }
 
 .collage {
@@ -233,9 +247,6 @@ body {
 }
 button.dropdown-list-item[aria-selected="true"] {
   background: rgba(0, 0, 0, 0.1);
-}
-.dropdown button:focus {
-  outline: 1px solid #ffdb3d;
 }
 .dropdown-selected[aria-expanded="true"] ~ .dropdown-list {
   opacity: 1;
@@ -427,6 +438,13 @@ button.next-prompt {
 .prompt-actions button.view-saved-prompts.active {
   display: block;
 }
+.prompt-actions button.view-saved-prompts.active:focus-visible {
+  background-color: #ffdb3d;
+}
+.prompt-actions button.view-saved-prompts.active:focus-visible::before {
+  border-right-color: #ffdb3d;
+}
+
 .meta {
   box-sizing: border-box;
   padding: 20px;
@@ -458,13 +476,14 @@ button.next-prompt {
   box-sizing: border-box;
   border: 2px solid rgb(83, 59, 30);
   background: rgb(39, 27, 12);
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: stretch;
   z-index: -1;
   transform: translate(-99999px, 0);
 }
 .modal.active {
+  display: flex;
   z-index: 9999;
   transform: translate(0, 0);
 }
