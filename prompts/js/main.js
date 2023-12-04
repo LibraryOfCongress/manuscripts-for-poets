@@ -85,6 +85,14 @@ class App {
     });
   }
 
+  static closeModals() {
+    const $modals = $('.modal');
+    $modals.each((i, modal) => {
+      const $modal = $(modal);
+      $modal.removeClass('active');
+    });
+  }
+
   downloadSavedPrompts() {
     const { savedPrompts } = this;
     if (savedPrompts.length <= 0) return;
@@ -149,11 +157,11 @@ class App {
   loadListeners() {
     $('.start').on('click', (e) => {
       $('.app').addClass('active');
-      $('.intro').removeClass('active');
+      $('.intro').removeClass('active').addClass('inactive');
     });
 
     $('.close-modal').on('click', (e) => {
-      $(e.currentTarget).closest('.modal').removeClass('active');
+      this.constructor.closeModals();
     });
 
     $('.next-prompt').on('click', (e) => {
