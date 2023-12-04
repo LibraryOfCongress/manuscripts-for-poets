@@ -6,8 +6,6 @@ const config = {
       }, {
         year: 1863, text: 'Terrell Born, Memphis, Tenn.', description: '',
       }, {
-        start: 1877, end: 1950, text: 'Nadir Period', description: 'A period of time where ceaseless extrajudicial violence (lynchings) were enacted in the South. Considered one of the most violent time periods for Black Americans in U.S History after slavery. Ida B. Wells “A Red Record”', type: 'era',
-      }, {
         start: 1880, end: 1949, text: 'Jim Crow Era', description: 'Due to violence surrounding voting, Black male voter registration drops to just 6%', type: 'era',
       }, {
         start: 1885, end: 1887, text: 'Terrell teaches at Wilberforce University', description: '',
