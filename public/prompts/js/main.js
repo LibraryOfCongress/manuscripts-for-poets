@@ -88,9 +88,16 @@ class App {
   static closeModals() {
     const $modals = $('.modal');
     $modals.each((i, modal) => {
-      const $modal = $(modal);
-      $modal.removeClass('active');
+      modal.setAttribute('hidden', true);
+      modal.setAttribute('aria-hidden', true);
+      modal.classList.remove('active');
     });
+    const $nonModals = $('.modal-inert');
+    $nonModals.each((i, el) => {
+      el.removeAttribute('inert');
+      el.removeAttribute('aria-hidden');
+    });
+    $('.next-prompt').first().focus();
   }
 
   downloadSavedPrompts() {
@@ -158,10 +165,14 @@ class App {
     $('.start').on('click', (e) => {
       $('.app').addClass('active');
       $('.intro').removeClass('active').addClass('inactive');
+      $('.next-prompt').first().focus();
     });
 
     $('.close-modal').on('click', (e) => {
       this.constructor.closeModals();
+    });
+    $(document).on('keydown', (e) => {
+      if (e.key === 'Escape') this.constructor.closeModals();
     });
 
     $('.next-prompt').on('click', (e) => {
@@ -580,7 +591,6 @@ class App {
   renderSavedPrompts() {
     const { savedPrompts } = this;
     if (savedPrompts.length <= 0) return;
-    const $modal = $('#saved-prompts');
     const $container = $('#saved-prompts-container');
     let html = '';
     savedPrompts.forEach(({ text, index, itemUrl }) => {
@@ -592,7 +602,8 @@ class App {
       html += '</div>';
     });
     $container.html(html);
-    $modal.addClass('active');
+    this.constructor.showModal('saved-prompts');
+    $('#saved-prompts .close-modal').first().focus();
   }
 
   renderStateButtons() {
@@ -643,7 +654,7 @@ class App {
         j += 1;
       }
     });
-    console.log(`Found ${buckets.length} buckets`);
+    // console.log(`Found ${buckets.length} buckets`);
     const $timeline = $('#timeline');
     let html = '';
     // place year markers
@@ -726,7 +737,22 @@ class App {
     if (promptIndex) {
       this.renderDocument(promptIndex);
     }
-    this.$documentModal.addClass('active');
+    this.constructor.showModal('document-browser');
+    this.$documentModal.find('.resource-link').focus();
+  }
+
+  static showModal(id) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    modal.removeAttribute('hidden');
+    modal.removeAttribute('aria-hidden');
+    modal.classList.add('active');
+    // hide everything else from screen reader
+    const $nonModals = $('.modal-inert');
+    $nonModals.each((i, el) => {
+      el.setAttribute('inert', true);
+      el.setAttribute('aria-hidden', true);
+    });
   }
 
   static toggleMenu($menuButton) {
