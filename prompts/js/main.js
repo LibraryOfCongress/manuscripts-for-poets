@@ -296,7 +296,7 @@ class App {
     });
 
     setTimeout(() => {
-      $container.css('opacity', '0.333');
+      $container.css('opacity', '0.2');
       this.$intro.addClass('active');
       $('.collage-image').css('transition', 'none');
       // move the images when the mouse moves
@@ -312,8 +312,8 @@ class App {
           const imy = MathUtil.lerp(-1, 1, y);
           const dx = imx * nx;
           const dy = imy * ny;
-          const deltaX = dx * 50;
-          const deltaY = dy * 50;
+          const deltaX = dx * 5;
+          const deltaY = dy * 5;
           $image.css('transform', `translate(${deltaX}px, ${deltaY}px)`);
         });
       });
