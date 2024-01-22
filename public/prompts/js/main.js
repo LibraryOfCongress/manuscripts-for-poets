@@ -91,6 +91,9 @@ class App {
       modal.setAttribute('hidden', true);
       modal.setAttribute('aria-hidden', true);
       modal.classList.remove('active');
+      modal.querySelectorAll('.focusable').forEach((el) => {
+        el.setAttribute('tabindex', '-1');
+      });
     });
     const $nonModals = $('.modal-inert');
     $nonModals.each((i, el) => {
@@ -296,11 +299,13 @@ class App {
     });
 
     setTimeout(() => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       $container.css('opacity', '0.2');
       this.$intro.addClass('active');
       $('.collage-image').css('transition', 'none');
       // move the images when the mouse moves
       this.$main.on('mousemove', (e) => {
+        if (prefersReducedMotion) return;
         const { clientX, clientY } = e;
         let nx = MathUtil.clamp(clientX / windowW);
         let ny = MathUtil.clamp(clientY / windowH);
@@ -456,7 +461,8 @@ class App {
     const { savedPrompts } = this;
     const $button = $('.view-saved-prompts');
     if (savedPrompts.length > 0) {
-      $button.text(savedPrompts.length.toLocaleString()).addClass('active');
+      $button.find('.saved-prompt-count').text(savedPrompts.length.toLocaleString());
+      $button.addClass('active');
     } else {
       $button.removeClass('active');
     }
@@ -479,7 +485,7 @@ class App {
     const matchText = text.replace(prompt.text, `</span><strong>${prompt.text}</strong><span>`);
     let html = '';
     html += `<div id="transcript-pane" class="pane transcript"><p><span>${matchText}</span></p></div>`;
-    html += `<a href="${prompt.itemUrl}" target="_blank" class="pane image" style="background-image: url(${doc.DownloadUrl})"><span class="visually-hidden">View this on the Library of Congress website</span></a>`;
+    html += `<a href="${prompt.itemUrl}" target="_blank" class="pane image focusable" style="background-image: url(${doc.DownloadUrl})" tabindex="-1"><span class="visually-hidden">A manuscript document containing some combination of typed script and handwritten nodes. Click to view this on the Library of Congress website.</span></a>`;
     $document.html(html);
     $title.text(doc.Item);
     $title.attr('href', doc.itemUrl);
@@ -573,8 +579,8 @@ class App {
     html += '<svg class="bookmark-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>';
     html += '</svg></button>';
-    html += `<button class="view-saved-prompts ${(savedPrompts.length > 0 ? 'active' : '')}" title="View saved prompts">`;
-    html += savedPrompts.length.toLocaleString();
+    html += `<button class="view-saved-prompts ${(savedPrompts.length > 0 ? 'active' : '')}" title="View saved prompts" aria-live="polite">`;
+    html += `<span class="saved-prompt-count">${savedPrompts.length.toLocaleString()}</span><span class="visually-hidden"> saved prompts</span>`;
     html += '</button>';
     html += '</span>';
     html += '</p>';
@@ -747,6 +753,9 @@ class App {
     modal.removeAttribute('hidden');
     modal.removeAttribute('aria-hidden');
     modal.classList.add('active');
+    modal.querySelectorAll('.focusable').forEach((el) => {
+      el.removeAttribute('tabindex');
+    });
     // hide everything else from screen reader
     const $nonModals = $('.modal-inert');
     $nonModals.each((i, el) => {
