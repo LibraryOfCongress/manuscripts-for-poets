@@ -305,7 +305,7 @@ class App {
       $('.collage-image').css('transition', 'none');
       // move the images when the mouse moves
       this.$main.on('mousemove', (e) => {
-        if (prefersReducedMotion) return;
+        if (prefersReducedMotion.matches) return;
         const { clientX, clientY } = e;
         let nx = MathUtil.clamp(clientX / windowW);
         let ny = MathUtil.clamp(clientY / windowH);
