@@ -591,6 +591,8 @@ class App {
     html += `<h3>${prompt.Item} <button class="show-doc">View context</button><a href="${prompt.itemUrl}" class="button" target="_blank">View on loc.gov</button></h3>`;
     this.$meta.html(html);
 
+    $('.intro-link').attr('href', `?prompt=${prompt.index}`);
+
     this.renderDocument();
   }
 
