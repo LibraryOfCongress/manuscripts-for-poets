@@ -259,6 +259,7 @@ class App {
   }
 
   onImageLoad(images) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const $container = $('#collage');
     const containerW = $container.width();
     const containerH = $container.height();
@@ -274,9 +275,11 @@ class App {
       const deltaX = (0.5 - x) * containerW;
       let deltaY = containerH;
       if (y < 0.5) deltaY = -containerH;
-      $image.css({
-        transform: `translate(${deltaX}px, ${deltaY}px)`,
-      });
+      if (!prefersReducedMotion) {
+        $image.css({
+          transform: `translate(${deltaX}px, ${deltaY}px)`,
+        });
+      }
       // animate the images back to the original position
       const transitionDuration = MathUtil.lerp(0.5, 2, Math.random());
       const delayN = (0.5 - Math.abs(0.5 - x)) * 2; // delay longer for images in center
@@ -299,13 +302,12 @@ class App {
     });
 
     setTimeout(() => {
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       $container.css('opacity', '0.2');
       this.$intro.addClass('active');
       $('.collage-image').css('transition', 'none');
       // move the images when the mouse moves
       this.$main.on('mousemove', (e) => {
-        if (prefersReducedMotion.matches) return;
+        if (prefersReducedMotion) return;
         const { clientX, clientY } = e;
         let nx = MathUtil.clamp(clientX / windowW);
         let ny = MathUtil.clamp(clientY / windowH);
