@@ -201,10 +201,9 @@ class App {
       this.showDocument(index);
     });
 
-    this.$main.on('click', '.bookmark-prompt', (e) => {
-      const $button = $(e.currentTarget);
-      $button.toggleClass('active');
-      if ($button.hasClass('active')) this.savePrompt();
+    this.$main.on('change', '.bookmark-prompt', (e) => {
+      const $checkbox = $(e.currentTarget);
+      if ($checkbox.is(':checked')) this.savePrompt();
       else this.unsavePrompt();
     });
 
@@ -571,19 +570,27 @@ class App {
     html += '<p>';
     html += `<span class="prompt-inner-text show-doc">${prompt.text}</span>`;
     html += '<span class="prompt-actions">';
+
     html += '<button class="show-doc" title="View in context">';
     html += '<span class="visually-hidden">View in context</span>';
     html += '<svg class="zoom-in-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>';
     html += '</svg></button>';
-    html += `<button class="bookmark-prompt ${(isSaved ? 'active' : '')}" title="Save prompt" data-index="${prompt.index}">`;
+
+    html += '<span class="button-toggle">';
+    html += `<input id="bookmark-prompt-checkbox" class="bookmark-prompt" type="checkbox" value="${prompt.index}" ${(isSaved ? 'checked' : '')} />`;
+    html += '<label for="bookmark-prompt-checkbox">';
     html += '<span class="visually-hidden">Save prompt</span>';
     html += '<svg class="bookmark-icon" width="24" height="24" viewBox="0 0 24 24">';
     html += '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>';
-    html += '</svg></button>';
+    html += '</svg>';
+    html += '</label>';
+    html += '</span>';
+
     html += `<button class="view-saved-prompts ${(savedPrompts.length > 0 ? 'active' : '')}" title="View saved prompts" aria-live="polite">`;
     html += `<span class="saved-prompt-count">${savedPrompts.length.toLocaleString()}</span><span class="visually-hidden"> saved prompts</span>`;
     html += '</button>';
+
     html += '</span>';
     html += '</p>';
     this.$prompt.html(html);
@@ -786,7 +793,7 @@ class App {
     let prompt;
     if (promptIndex) {
       prompt = this.constructor.getPrompt(prompts, promptIndex);
-      $(`.bookmark-prompt[data-index="${promptIndex}"]`).removeClass('active');
+      $(`.bookmark-prompt[value="${promptIndex}"]`).prop('checked', false);
     } else prompt = this.constructor.getPrompt(filteredPrompts, state.prompt);
     this.savedPrompts = _.reject(this.savedPrompts, (p) => p.index === prompt.index);
     StringUtil.saveToStorage('saved-prompts', this.savedPrompts);

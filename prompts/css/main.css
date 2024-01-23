@@ -382,6 +382,14 @@ button.next-prompt {
 .prompt-text .prompt-inner-text {
   cursor: pointer;
 }
+
+.button-toggle input {
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  visibility: hidden;
+}
 .prompt-actions {
   white-space: nowrap;
   display: flex;
@@ -405,14 +413,18 @@ button.next-prompt {
 .prompt-actions path {
   fill: rgb(252, 183, 98);
 }
-.prompt-actions button:hover path {
+.prompt-actions button:hover path,
+.prompt-actions .button-toggle label:hover path {
   fill:rgb(254, 218, 173);
 }
-.prompt-actions button.bookmark-prompt.active path {
+.prompt-actions .button-toggle input:checked + label path {
   fill: rgb(157, 197, 138);
 }
-.prompt-actions button.bookmark-prompt.active:hover path {
+.prompt-actions .button-toggle input:checked + label:hover path {
   fill: rgb(198, 228, 184);
+}
+.prompt-actions .button-toggle label {
+  cursor: pointer;
 }
 .prompt-actions button.view-saved-prompts {
   display: none;
